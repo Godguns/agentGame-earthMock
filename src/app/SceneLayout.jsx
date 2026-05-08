@@ -16,8 +16,9 @@ export function SceneLayout() {
   const variant = getVariant(location.pathname);
 
   return (
-    <div className="scene-layout">
+    <div className={`scene-layout scene-layout--${variant}`}>
       <AmbientGlowField variant={variant} />
+      <div className="scene-layout__wash" aria-hidden="true" />
       <div className="scene-layout__content">
         <Outlet />
       </div>

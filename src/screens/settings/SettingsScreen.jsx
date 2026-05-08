@@ -309,6 +309,7 @@ function DateCalibrationModal({ initialValue, onClose, onConfirm }) {
 
       <div className="modal-shell__panel">
         <div className="modal-shell__frame" />
+        <div className="modal-shell__handle" aria-hidden="true" />
         <header className="modal-shell__header">
           <div>
             <p className="modal-shell__eyebrow">CHRONO CALIBRATION</p>

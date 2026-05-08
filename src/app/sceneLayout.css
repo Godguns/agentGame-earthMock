@@ -1,0 +1,12 @@
+.scene-layout {
+  position: relative;
+  min-height: 100dvh;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.scene-layout__content {
+  position: relative;
+  z-index: 1;
+  min-height: 100dvh;
+}

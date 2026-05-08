@@ -1,0 +1,138 @@
+.menu-screen {
+  position: relative;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top, rgba(98, 102, 121, 0.1), transparent 30%),
+    linear-gradient(180deg, #06070a 0%, #0b0f15 48%, #040404 100%);
+  color: #f2efe8;
+  animation: none;
+}
+
+.menu-screen__backdrop {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 24%),
+    radial-gradient(circle at 50% 24%, rgba(190, 204, 223, 0.1), transparent 26%);
+  filter: blur(6px);
+  animation: menu-backdrop-drift 18s ease-in-out infinite alternate;
+  opacity: 0.78;
+}
+
+.menu-screen__panel {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 340px);
+  padding: 24px;
+}
+
+.menu-screen.is-entering-from-settings .menu-screen__panel {
+  animation: menu-return-panel 720ms ease;
+}
+
+.menu-screen.is-entering-from-settings .menu-screen__backdrop,
+.menu-screen.is-entering-from-settings .ambient-glow-field {
+  animation:
+    menu-return-background 720ms ease,
+    menu-backdrop-drift 18s ease-in-out infinite alternate;
+}
+
+.menu-screen__eyebrow {
+  margin: 0 0 20px;
+  font-size: 0.72rem;
+  color: rgba(242, 239, 232, 0.44);
+  letter-spacing: 0.35em;
+}
+
+.menu-screen__title {
+  margin: 0 0 34px;
+  font-size: clamp(2.2rem, 9vw, 3.3rem);
+  font-weight: 300;
+  letter-spacing: 0.12em;
+}
+
+.menu-screen__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.menu-screen__button {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  background: transparent;
+  padding: 18px 0;
+  color: rgba(255, 255, 255, 0.82);
+  font: inherit;
+  font-size: 1rem;
+  text-align: left;
+  letter-spacing: 0.08em;
+  transition:
+    color 220ms ease,
+    border-color 220ms ease,
+    transform 220ms ease;
+}
+
+.menu-screen__button:hover {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.28);
+  transform: translateX(6px);
+}
+
+.menu-screen__button:focus-visible {
+  outline: none;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.32);
+}
+
+@keyframes menu-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.995);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes menu-backdrop-drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.68;
+  }
+
+  100% {
+    transform: translate3d(1.2%, -1%, 0) scale(1.05);
+    opacity: 0.92;
+  }
+}
+
+@keyframes menu-return-panel {
+  0% {
+    opacity: 0.12;
+    transform: translateY(14px) scale(0.992);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes menu-return-background {
+  0% {
+    opacity: 0.3;
+    transform: scale(1.02);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

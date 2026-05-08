@@ -1,0 +1,416 @@
+export const SETTINGS_SECTIONS = [
+  {
+    id: "persona",
+    label: "虚拟人格标定",
+    description: "定义出身、家庭、身体与情感底色。",
+  },
+  {
+    id: "audio",
+    label: "音频环境",
+    description: "环境音、提示音与沉浸式震感策略。",
+  },
+  {
+    id: "text",
+    label: "文本表现",
+    description: "打字速度、过渡节奏、阅读舒适度。",
+  },
+  {
+    id: "archive",
+    label: "存档与数据",
+    description: "本地存档、同步策略与记忆缓存。",
+  },
+];
+
+export const PERSONA_CALIBRATION_SECTIONS = [
+  {
+    id: "origin",
+    title: "一、时空锚点",
+    subtitle: "出身",
+    questions: [
+      {
+        id: "birthDate",
+        type: "date",
+        prompt: "1. 你的出生年份？",
+      },
+      {
+        id: "birthplaceTier",
+        type: "single-choice",
+        prompt: "2. 你出生在什么地方？",
+        options: [
+          "A：一线/新一线城市",
+          "B：二三线城市",
+          "C：县城/乡镇",
+          "D：偏远地区",
+        ],
+      },
+      {
+        id: "familyType",
+        type: "single-choice",
+        prompt: "3. 你的原生家庭类型？",
+        options: [
+          "A：双职工稳定家庭",
+          "B：经商/波动家庭",
+          "C：体制内保守家庭",
+          "D：单亲/离异重组家庭",
+        ],
+      },
+      {
+        id: "familyExpectation",
+        type: "single-choice",
+        prompt: "4. 家庭对你的期望？",
+        options: [
+          "A：出人头地",
+          "B：安稳就好",
+          "C：继承家业/走安排好的路",
+          "D：从未明确表达过",
+        ],
+      },
+    ],
+  },
+  {
+    id: "childhood",
+    title: "二、原生反馈",
+    subtitle: "童年",
+    questions: [
+      {
+        id: "childhoodFeedback",
+        type: "single-choice",
+        prompt: "5. 童年最常听到的评价？",
+        options: [
+          "A：“这孩子真聪明”",
+          "B：“这孩子真听话”",
+          "C：“你看看别人家孩子”",
+          "D：“这孩子真让人操心”",
+          "E：没有太多评价，主要是沉默",
+        ],
+      },
+      {
+        id: "similarToParents",
+        type: "single-choice",
+        prompt: "6. 你和父母最像的地方？",
+        options: [
+          "A：脾气",
+          "B：价值观",
+          "C：说话方式",
+          "D：不太像，更像对立面",
+        ],
+      },
+      {
+        id: "meaningOfHome",
+        type: "single-choice",
+        prompt: "7. 成年后，“家”对你来说是？",
+        options: [
+          "A：温暖的避风港",
+          "B：想逃离又离不开",
+          "C：需要证明自己的地方",
+          "D：很久没回去了",
+        ],
+      },
+    ],
+  },
+  {
+    id: "body",
+    title: "三、肉身容器",
+    subtitle: "身体",
+    questions: [
+      {
+        id: "bodyFeedback",
+        type: "single-choice",
+        prompt: "8. 你的身体给你的反馈？",
+        options: [
+          "A：精力旺盛，熬夜恢复快",
+          "B：一般水平，偶尔小毛病",
+          "C：容易疲惫，有慢性困扰",
+          "D：有需要长期关注的健康问题",
+        ],
+      },
+      {
+        id: "bodyCareAttitude",
+        type: "single-choice",
+        prompt: "9. 对身体管理的态度？",
+        options: [
+          "A：不在意，年轻就是资本",
+          "B：知道该锻炼，但有心无力",
+          "C：焦虑但拖延",
+          "D：已经在规律维护",
+        ],
+      },
+      {
+        id: "relaxMode",
+        type: "single-choice",
+        prompt: "10. 最能让你放松的方式？",
+        options: [
+          "A：一个人待着",
+          "B：和朋友在一起",
+          "C：运动/出汗",
+          "D：吃东西/喝酒",
+          "E：沉浸在爱好里",
+        ],
+      },
+    ],
+  },
+  {
+    id: "skills",
+    title: "四、技能模组",
+    subtitle: "能力",
+    questions: [
+      {
+        id: "skillBias",
+        type: "single-choice",
+        prompt: "11. 你更倾向于哪种能力？",
+        options: [
+          "A：逻辑分析/数理",
+          "B：语言表达/人际",
+          "C：艺术感知/创作",
+          "D：动手实操/技术",
+        ],
+      },
+      {
+        id: "learningStyle",
+        type: "single-choice",
+        prompt: "12. 你最擅长怎样学习？",
+        options: [
+          "A：看书/看教程自学",
+          "B：跟着别人做",
+          "C：在实践中试错",
+          "D：需要有人手把手教",
+        ],
+      },
+      {
+        id: "biggestWeakness",
+        type: "single-choice",
+        prompt: "13. 你觉得自己最大的短板？",
+        options: [
+          "A：不够自信",
+          "B：不擅长社交",
+          "C：三分钟热度",
+          "D：不爱争抢",
+          "E：想太多做太少",
+        ],
+      },
+    ],
+  },
+  {
+    id: "soul",
+    title: "五、灵魂残响",
+    subtitle: "内心",
+    questions: [
+      {
+        id: "greatestFear",
+        type: "single-choice",
+        prompt: "14. 你最害怕什么？",
+        options: [
+          "A：一事无成",
+          "B：让在乎的人失望",
+          "C：失去自由",
+          "D：被遗忘/被忽视",
+          "E：看不清未来",
+        ],
+      },
+      {
+        id: "deepestDesire",
+        type: "single-choice",
+        prompt: "15. 你最渴望什么？",
+        options: [
+          "A：被看见/被认可",
+          "B：真正的自由",
+          "C：安全感/稳定",
+          "D：深刻的关系",
+          "E：知道“为什么活着”",
+        ],
+      },
+      {
+        id: "lifePriority",
+        type: "single-choice",
+        prompt: "16. 如果人生是游戏，你认为最重要的是？",
+        options: [
+          "A：体验尽可能多的剧情",
+          "B：把主线任务做到最好",
+          "C：和队友建立羁绊",
+          "D：找到隐藏的秘密",
+        ],
+      },
+      {
+        id: "alienBelief",
+        type: "single-choice",
+        prompt: "17. 你相信有外星人吗？",
+        options: [
+          "A：相信",
+          "B：不信",
+          "C：不确定，但希望有",
+        ],
+      },
+    ],
+  },
+  {
+    id: "love",
+    title: "六、情感图谱",
+    subtitle: "爱情",
+    questions: [
+      {
+        id: "relationshipStatus",
+        type: "single-choice",
+        prompt: "18. 你目前的情感状态？",
+        options: [
+          "A：单身，圈子太小",
+          "B：单身，先搞事业",
+          "C：正在恋爱中",
+          "D：刚结束一段感情",
+          "E：有一段模糊说不清的关系",
+          "F：母胎单身",
+        ],
+      },
+      {
+        id: "attachmentStyle",
+        type: "single-choice",
+        prompt: "19. 在亲密关系中，你更像？",
+        options: [
+          "A：付出型",
+          "B：依赖型",
+          "C：回避型",
+          "D：平衡型",
+          "E：还不确定",
+        ],
+      },
+      {
+        id: "partnerPriority",
+        type: "single-choice",
+        prompt: "20. 对另一半最看重什么？",
+        options: [
+          "A：情绪价值",
+          "B：经济稳定",
+          "C：有趣的灵魂",
+          "D：共同的价值观",
+          "E：外形和感觉",
+        ],
+      },
+      {
+        id: "loveFear",
+        type: "single-choice",
+        prompt: "21. 在爱情里最害怕什么？",
+        options: [
+          "A：被背叛/被欺骗",
+          "B：付出不被看见",
+          "C：慢慢没话说",
+          "D：现实原因被迫分开",
+          "E：发现自己不值得被爱",
+        ],
+      },
+      {
+        id: "parentsMarriageImpact",
+        type: "single-choice",
+        prompt: "22. 父母的婚姻对你有什么影响？",
+        options: [
+          "A：挺好的，希望能像他们一样",
+          "B：总是吵架，不想重复",
+          "C：平淡，不知道算不算爱",
+          "D：离了/分开了，有些悲观",
+          "E：为我勉强在一起，有压力",
+        ],
+      },
+    ],
+  },
+  {
+    id: "finance",
+    title: "七、经济沙盘",
+    subtitle: "财务",
+    questions: [
+      {
+        id: "savingsLevel",
+        type: "single-choice",
+        prompt: "23. 目前的存款状况？",
+        options: [
+          "A：几乎没有（<2000）",
+          "B：有一点应急钱（2000-1万）",
+          "C：有几个月生活费（1万-5万）",
+          "D：有不错的储蓄（5万-20万）",
+          "E：比较充足（20万以上）",
+        ],
+      },
+      {
+        id: "debtStatus",
+        type: "single-choice",
+        prompt: "24. 目前有负债吗？",
+        options: [
+          "A：无债一身轻",
+          "B：有花呗/信用卡，但可控",
+          "C：有分期贷款，每月有压力",
+          "D：有助学贷款",
+          "E：有较大额借款/房贷",
+        ],
+      },
+      {
+        id: "incomeSource",
+        type: "single-choice",
+        prompt: "25. 主要收入来源？",
+        options: [
+          "A：全职工作，固定工资",
+          "B：自由职业/接零活",
+          "C：兼职+家里偶尔支持",
+          "D：主要靠家里支持",
+          "E：目前没有稳定收入",
+        ],
+      },
+      {
+        id: "moneyMindset",
+        type: "single-choice",
+        prompt: "26. 对金钱的态度？",
+        options: [
+          "A：省吃俭用型",
+          "B：该花就花型",
+          "C：冲动消费型",
+          "D：搞钱优先型",
+          "E：不太在意，够用就行",
+        ],
+      },
+      {
+        id: "emergencyCash",
+        type: "single-choice",
+        prompt: "27. 急需5000块，你能从哪里找到？",
+        options: [
+          "A：自己的存款",
+          "B：跟父母开口",
+          "C：找朋友/伴侣周转",
+          "D：借网贷/套信用卡",
+          "E：不知道，可能只能硬扛",
+        ],
+      },
+    ],
+  },
+  {
+    id: "opening",
+    title: "八、初始锚点",
+    subtitle: "开局",
+    questions: [
+      {
+        id: "careerStatus",
+        type: "single-choice",
+        prompt: "28. 你目前的职业状态？",
+        options: [
+          "A：刚毕业/即将毕业",
+          "B：在职中，但不安现状",
+          "C：自由职业/打零工",
+          "D：辞职了/正在gap",
+          "E：还在上学/考研中",
+        ],
+      },
+      {
+        id: "carryItem",
+        type: "single-choice",
+        prompt: "29. 随身携带最重要的东西？",
+        options: [
+          "A：一个信封，里面是家里给的5000块",
+          "B：一把吉他/相机/数位板（爱好工具）",
+          "C：一本没写完的日记",
+        ],
+      },
+      {
+        id: "playerName",
+        type: "text",
+        prompt: "30. 你的名字？",
+        maxLength: 12,
+        placeholder: "限 12 字以内",
+      },
+    ],
+  },
+];

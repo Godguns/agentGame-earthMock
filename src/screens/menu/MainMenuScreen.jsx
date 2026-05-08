@@ -170,6 +170,11 @@ export function MainMenuScreen() {
   const menuLabel = useMemo(() => "主菜单", []);
 
   const handleAction = (action) => {
+    if (action === "start" || action === "continue") {
+      navigate("/game");
+      return;
+    }
+
     if (action === "settings") {
       navigate("/settings");
       return;

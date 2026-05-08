@@ -34,15 +34,94 @@ const SECTION_START_INDICES = PERSONA_CALIBRATION_SECTIONS.map((section) =>
   FLAT_PERSONA_QUESTIONS.findIndex((question) => question.section.id === section.id),
 );
 
+function buildDefaultAnswer(question) {
+  if (question.type === "date") {
+    return DEFAULT_BIRTH_DATE;
+  }
+
+  if (question.type === "multi-choice") {
+    return [];
+  }
+
+  if (question.allowOther) {
+    return {
+      selected: "",
+      other: "",
+    };
+  }
+
+  return "";
+}
+
+function normalizeAnswer(question, value) {
+  if (question.type === "date") {
+    if (
+      value &&
+      typeof value === "object" &&
+      Number.isFinite(value.year) &&
+      Number.isFinite(value.month) &&
+      Number.isFinite(value.day)
+    ) {
+      return {
+        year: value.year,
+        month: value.month,
+        day: value.day,
+      };
+    }
+
+    return DEFAULT_BIRTH_DATE;
+  }
+
+  if (question.type === "multi-choice") {
+    if (Array.isArray(value)) {
+      return value.filter((item) => typeof item === "string" && item.trim().length > 0);
+    }
+
+    if (typeof value === "string" && value.trim().length > 0) {
+      return [value];
+    }
+
+    return [];
+  }
+
+  if (question.allowOther) {
+    if (typeof value === "string") {
+      return {
+        selected: value,
+        other: "",
+      };
+    }
+
+    if (value && typeof value === "object") {
+      return {
+        selected: typeof value.selected === "string" ? value.selected : "",
+        other: typeof value.other === "string" ? value.other : "",
+      };
+    }
+
+    return {
+      selected: "",
+      other: "",
+    };
+  }
+
+  return typeof value === "string" ? value : "";
+}
+
 function buildInitialAnswers() {
   return PERSONA_CALIBRATION_SECTIONS.reduce((accumulator, section) => {
     section.questions.forEach((question) => {
-      if (question.type === "date") {
-        accumulator[question.id] = DEFAULT_BIRTH_DATE;
-        return;
-      }
+      accumulator[question.id] = buildDefaultAnswer(question);
+    });
 
-      accumulator[question.id] = "";
+    return accumulator;
+  }, {});
+}
+
+function normalizeStoredAnswers(storedAnswers) {
+  return PERSONA_CALIBRATION_SECTIONS.reduce((accumulator, section) => {
+    section.questions.forEach((question) => {
+      accumulator[question.id] = normalizeAnswer(question, storedAnswers?.[question.id]);
     });
 
     return accumulator;
@@ -57,13 +136,33 @@ function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
 }
 
-function isAnswerComplete(value) {
-  if (!value) {
-    return false;
+function isAnswerComplete(question, value) {
+  if (question.type === "date") {
+    return Boolean(value?.year && value?.month && value?.day);
   }
 
-  if (typeof value === "object") {
-    return Object.values(value).every(Boolean);
+  if (question.type === "multi-choice") {
+    return Array.isArray(value) && value.length > 0;
+  }
+
+  if (question.allowOther) {
+    if (!value || typeof value !== "object") {
+      return false;
+    }
+
+    if (!value.selected?.trim()) {
+      return false;
+    }
+
+    if (value.selected === question.otherOptionValue) {
+      return value.other.trim().length > 0;
+    }
+
+    return true;
+  }
+
+  if (typeof value !== "string") {
+    return false;
   }
 
   return value.trim().length > 0;
@@ -343,12 +442,29 @@ function DateCalibrationModal({ initialValue, onClose, onConfirm }) {
 }
 
 function ChoiceQuestion({ question, value, onChange }) {
+  const isMultiChoice = question.type === "multi-choice";
+  const selectedValues = isMultiChoice && Array.isArray(value) ? value : [];
+  const selectedValue =
+    !isMultiChoice && question.allowOther && value && typeof value === "object"
+      ? value.selected
+      : !isMultiChoice
+        ? value
+        : "";
+  const otherValue =
+    question.allowOther && value && typeof value === "object" ? value.other : "";
+  const showOtherInput =
+    question.allowOther && selectedValue === question.otherOptionValue;
+
   return (
     <fieldset className="persona-question">
       <legend className="persona-question__title">{question.prompt}</legend>
+      {question.hint ? <p className="persona-question__hint">{question.hint}</p> : null}
+
       <div className="persona-question__choices">
         {question.options.map((option) => {
-          const checked = value === option;
+          const checked = isMultiChoice
+            ? selectedValues.includes(option)
+            : selectedValue === option;
 
           return (
             <label
@@ -356,17 +472,57 @@ function ChoiceQuestion({ question, value, onChange }) {
               className={`choice-chip ${checked ? "is-active" : ""}`}
             >
               <input
-                type="radio"
+                type={isMultiChoice ? "checkbox" : "radio"}
                 name={question.id}
                 value={option}
                 checked={checked}
-                onChange={(event) => onChange(event.target.value)}
+                onChange={() => {
+                  if (isMultiChoice) {
+                    const nextValue = checked
+                      ? selectedValues.filter((item) => item !== option)
+                      : [...selectedValues, option];
+
+                    onChange(nextValue);
+                    return;
+                  }
+
+                  if (question.allowOther) {
+                    onChange({
+                      selected: option,
+                      other: option === question.otherOptionValue ? otherValue : "",
+                    });
+                    return;
+                  }
+
+                  onChange(option);
+                }}
               />
               <span>{option}</span>
             </label>
           );
         })}
       </div>
+
+      {showOtherInput ? (
+        <div className="persona-question__aux">
+          <div className="persona-question__text-wrap">
+            <input
+              className="persona-question__input"
+              type="text"
+              value={otherValue}
+              maxLength={24}
+              placeholder={question.otherPlaceholder ?? "请补充说明"}
+              onChange={(event) =>
+                onChange({
+                  selected: question.otherOptionValue,
+                  other: event.target.value,
+                })
+              }
+            />
+            <span className="persona-question__counter">{otherValue.length}/24</span>
+          </div>
+        </div>
+      ) : null}
     </fieldset>
   );
 }
@@ -378,6 +534,7 @@ function DateQuestion({ question, value, onChange }) {
     <>
       <div className="persona-question">
         <p className="persona-question__title">{question.prompt}</p>
+        {question.hint ? <p className="persona-question__hint">{question.hint}</p> : null}
 
         <button
           className="date-trigger"
@@ -433,8 +590,8 @@ function PersonaCalibrationPanel({ answers, onAnswerChange }) {
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
   const answeredCount = useMemo(
     () =>
-      Object.values(answers).reduce((count, value) => {
-        return count + (isAnswerComplete(value) ? 1 : 0);
+      FLAT_PERSONA_QUESTIONS.reduce((count, question) => {
+        return count + (isAnswerComplete(question, answers[question.id]) ? 1 : 0);
       }, 0),
     [answers],
   );
@@ -442,7 +599,7 @@ function PersonaCalibrationPanel({ answers, onAnswerChange }) {
     () =>
       PERSONA_CALIBRATION_SECTIONS.map((section) => {
         const completedQuestions = section.questions.filter((question) =>
-          isAnswerComplete(answers[question.id]),
+          isAnswerComplete(question, answers[question.id]),
         ).length;
 
         return {
@@ -560,7 +717,7 @@ function PersonaCalibrationPanel({ answers, onAnswerChange }) {
               </h3>
             </div>
             <p className="persona-card__status">
-              {isAnswerComplete(currentValue)
+              {isAnswerComplete(activeEntry, currentValue)
                 ? "已写入初始人格缓存"
                 : "等待确认"}
             </p>
@@ -583,7 +740,7 @@ function PersonaCalibrationPanel({ answers, onAnswerChange }) {
               />
             ) : null}
 
-            {activeEntry.type === "single-choice" ? (
+            {activeEntry.type === "single-choice" || activeEntry.type === "multi-choice" ? (
               <ChoiceQuestion
                 question={activeEntry}
                 value={answers[activeEntry.id]}
@@ -671,10 +828,7 @@ export function SettingsScreen() {
       }
 
       const parsed = JSON.parse(storedValue);
-      setAnswers((current) => ({
-        ...current,
-        ...parsed,
-      }));
+      setAnswers(normalizeStoredAnswers(parsed));
     } catch (error) {
       console.warn("Failed to restore settings draft.", error);
     }

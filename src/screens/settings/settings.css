@@ -510,6 +510,14 @@ fieldset.persona-question {
   line-height: 1.7;
 }
 
+.persona-question__hint {
+  margin: -4px 0 12px;
+  color: rgba(var(--settings-accent-rgb), 0.5);
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  line-height: 1.6;
+}
+
 .persona-question__choices {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -553,6 +561,10 @@ fieldset.persona-question {
   position: absolute;
   opacity: 0;
   pointer-events: none;
+}
+
+.persona-question__aux {
+  margin-top: 12px;
 }
 
 .date-trigger {

@@ -7,12 +7,12 @@ export const SETTINGS_SECTIONS = [
   {
     id: "audio",
     label: "音频环境",
-    description: "环境音、提示音与沉浸式震感策略。",
+    description: "环境音、提示音与沉浸式声场策略。",
   },
   {
     id: "text",
     label: "文本表现",
-    description: "打字速度、过渡节奏、阅读舒适度。",
+    description: "打字速度、过渡节奏与阅读舒适度。",
   },
   {
     id: "archive",
@@ -31,6 +31,7 @@ export const PERSONA_CALIBRATION_SECTIONS = [
         id: "birthDate",
         type: "date",
         prompt: "1. 你的出生年份？",
+        hint: "通过日期组件自填，具体年代分类将由后端处理。",
       },
       {
         id: "birthplaceTier",
@@ -52,7 +53,11 @@ export const PERSONA_CALIBRATION_SECTIONS = [
           "B：经商/波动家庭",
           "C：体制内保守家庭",
           "D：单亲/离异重组家庭",
+          "E：其他",
         ],
+        allowOther: true,
+        otherOptionValue: "E：其他",
+        otherPlaceholder: "补充你的家庭类型",
       },
       {
         id: "familyExpectation",
@@ -119,8 +124,8 @@ export const PERSONA_CALIBRATION_SECTIONS = [
         prompt: "8. 你的身体给你的反馈？",
         options: [
           "A：精力旺盛，熬夜恢复快",
-          "B：一般水平，偶尔小毛病",
-          "C：容易疲惫，有慢性困扰",
+          "B：一般水平，偶尔小毛病（亚健康）",
+          "C：容易疲惫，有慢性疾病困扰",
           "D：有需要长期关注的健康问题",
         ],
       },
@@ -141,9 +146,9 @@ export const PERSONA_CALIBRATION_SECTIONS = [
         prompt: "10. 最能让你放松的方式？",
         options: [
           "A：一个人待着",
-          "B：和朋友在一起",
+          "B：和关系亲近的人（亲人/朋友/恋人）在一起",
           "C：运动/出汗",
-          "D：吃东西/喝酒",
+          "D：吃东西/喝酒（吃喝玩乐）",
           "E：沉浸在爱好里",
         ],
       },
@@ -156,8 +161,9 @@ export const PERSONA_CALIBRATION_SECTIONS = [
     questions: [
       {
         id: "skillBias",
-        type: "single-choice",
+        type: "multi-choice",
         prompt: "11. 你更倾向于哪种能力？",
+        hint: "可多选",
         options: [
           "A：逻辑分析/数理",
           "B：语言表达/人际",
@@ -202,7 +208,7 @@ export const PERSONA_CALIBRATION_SECTIONS = [
         options: [
           "A：一事无成",
           "B：让在乎的人失望",
-          "C：失去自由",
+          "C：失去自由（海的那边是什么呢）",
           "D：被遗忘/被忽视",
           "E：看不清未来",
         ],
@@ -237,7 +243,7 @@ export const PERSONA_CALIBRATION_SECTIONS = [
         options: [
           "A：相信",
           "B：不信",
-          "C：不确定，但希望有",
+          "C：不确定，但希望有（威震天，这边走，我知道一条小路）",
         ],
       },
     ],
@@ -375,6 +381,18 @@ export const PERSONA_CALIBRATION_SECTIONS = [
           "E：不知道，可能只能硬扛",
         ],
       },
+      {
+        id: "smallEmergencyCash",
+        type: "single-choice",
+        prompt: "28. 那如果是周四急需50块呢，你能从哪里找到？",
+        options: [
+          "A：自己的存款",
+          "B：跟父母开口",
+          "C：疯狂给朋友发疯狂文案",
+          "D：不知道，可能在各种群里发癫",
+          "E：不知道，我的身材很曼妙",
+        ],
+      },
     ],
   },
   {
@@ -385,29 +403,30 @@ export const PERSONA_CALIBRATION_SECTIONS = [
       {
         id: "careerStatus",
         type: "single-choice",
-        prompt: "28. 你目前的职业状态？",
+        prompt: "29. 你目前的职业状态？",
         options: [
           "A：刚毕业/即将毕业",
           "B：在职中，但不安现状",
           "C：自由职业/打零工",
-          "D：辞职了/正在gap",
+          "D：辞职了/正在 gap",
           "E：还在上学/考研中",
         ],
       },
       {
         id: "carryItem",
         type: "single-choice",
-        prompt: "29. 随身携带最重要的东西？",
+        prompt: "30. 随身携带最重要的东西？",
         options: [
           "A：一个信封，里面是家里给的5000块",
           "B：一把吉他/相机/数位板（爱好工具）",
           "C：一本没写完的日记",
+          "D：难不成还能是一张过去的CD？",
         ],
       },
       {
         id: "playerName",
         type: "text",
-        prompt: "30. 你的名字？",
+        prompt: "31. 你的名字？",
         maxLength: 12,
         placeholder: "限 12 字以内",
       },

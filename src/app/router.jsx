@@ -1,11 +1,11 @@
-import { Navigate, createBrowserRouter } from "react-router-dom";
+import { Navigate, createHashRouter } from "react-router-dom";
 
 import { LoadingRoute } from "../routes/LoadingRoute";
 import { MainMenuRoute } from "../routes/MainMenuRoute";
 import { SettingsRoute } from "../routes/SettingsRoute";
 import { SceneLayout } from "./SceneLayout";
 
-export const router = createBrowserRouter([
+export const router = createHashRouter([
   {
     path: "/",
     element: <Navigate to="/loading" replace />,

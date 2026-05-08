@@ -2,6 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocation, useNavigate } from "react-router-dom";
 
+import godgunsAvatar from "../../../godguns.jpg";
+import liwenAvatar from "../../../liwen.jpg";
+
 import "./menu.css";
 
 const MENU_ITEMS = [
@@ -15,13 +18,13 @@ const DEVELOPERS = [
   {
     id: "jin",
     name: "异世界的大大金",
-    avatarSrc: "/godguns.jpg",
+    avatarSrc: godgunsAvatar,
     fallback: "金",
   },
   {
     id: "tang",
     name: "大吃一口跳跳糖",
-    avatarSrc: "/liwen.jpg",
+    avatarSrc: liwenAvatar,
     fallback: "糖",
   },
 ];
@@ -70,7 +73,12 @@ function AboutOverlay({ onClose }) {
   }, [onClose]);
 
   return createPortal(
-    <div className="about-overlay" role="dialog" aria-modal="true" aria-labelledby="about-overlay-title">
+    <div
+      className="about-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="about-overlay-title"
+    >
       <button
         type="button"
         className="about-overlay__backdrop"

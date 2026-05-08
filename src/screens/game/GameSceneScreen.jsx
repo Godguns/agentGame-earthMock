@@ -146,10 +146,6 @@ export function GameSceneScreen() {
     [activeHotspotId],
   );
 
-  const currentSceneImage = isLampOn
-    ? bedroomSceneLampOn
-    : bedroomSceneLampOff;
-
   return (
     <main
       className={`game-scene game-scene--${phase} ${
@@ -161,9 +157,15 @@ export function GameSceneScreen() {
 
       <div className="game-scene__art">
         <img
-          className="game-scene__image"
-          src={currentSceneImage}
+          className="game-scene__image game-scene__image--lamp-on"
+          src={bedroomSceneLampOn}
           alt="卧室里的办公桌场景，桌面上摆放着电脑、平板和手机。"
+        />
+        <img
+          className="game-scene__image game-scene__image--lamp-off"
+          src={bedroomSceneLampOff}
+          alt=""
+          aria-hidden="true"
         />
       </div>
 

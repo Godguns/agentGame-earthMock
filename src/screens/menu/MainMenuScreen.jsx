@@ -117,6 +117,8 @@ function AboutOverlay({ onClose }) {
         >
           RETURN
         </button>
+
+        <p className="about-overlay__copyright">Copyright 2026</p>
       </section>
     </div>,
     document.body,

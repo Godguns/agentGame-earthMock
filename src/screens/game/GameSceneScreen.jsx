@@ -16,7 +16,7 @@ const WEATHER_OPTIONS = [
     id: "cloudy",
     label: "多云",
     image: GAME_SCENE_ASSETS.weatherCloudy,
-    mood: "天色发灰，像一整天都没有真正开始。",
+    mood: "天色发灰，像一整天都还没真正开始。",
   },
   {
     id: "sunny",
@@ -244,6 +244,19 @@ function OrbIcon({ kind }) {
     );
   }
 
+  if (kind === "music") {
+    return (
+      <svg {...commonProps}>
+        <path
+          d="M14.8 6.2V14.1C14.8 15.6 13.6 16.8 12.1 16.8C10.8 16.8 9.8 15.9 9.8 14.7C9.8 13.5 10.8 12.6 12.1 12.6C12.7 12.6 13.3 12.8 13.8 13.2V7.4L18.2 6V12.8C18.2 14.3 17 15.5 15.5 15.5C14.2 15.5 13.2 14.6 13.2 13.4C13.2 12.2 14.2 11.3 15.5 11.3C16.1 11.3 16.7 11.5 17.2 11.9V4.8L14.8 6.2Z"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+
   return (
     <svg {...commonProps}>
       <path d="M6 12H18" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
@@ -458,6 +471,14 @@ export function GameSceneScreen() {
       </button>
 
       <header className="game-scene__weather-shell">
+        <div className="game-scene__weather-card">
+          <span className="game-scene__weather-date">
+            2026-05-09 | {activeWeather.label}
+          </span>
+          <strong className="game-scene__weather-title">窗外</strong>
+          <p className="game-scene__weather-copy">{activeWeather.mood}</p>
+        </div>
+
         <div
           className={`game-scene__control-orbs ${
             controlsExpanded ? "is-expanded" : ""
@@ -482,6 +503,20 @@ export function GameSceneScreen() {
               controlsExpanded ? "is-expanded" : ""
             }`}
           >
+            <button
+              type="button"
+              className={`game-scene__control-orb ${
+                activeSurfaceId === "ipod" ? "is-active" : ""
+              }`}
+              onClick={() => setActiveSurfaceId("ipod")}
+              disabled={phase !== "awake" || isOverlayActive}
+              aria-label="打开音乐播放器"
+            >
+              <span className="game-scene__orb-icon" aria-hidden="true">
+                <OrbIcon kind="music" />
+              </span>
+            </button>
+
             <button
               type="button"
               className={`game-scene__control-orb ${
@@ -513,14 +548,6 @@ export function GameSceneScreen() {
               </button>
             ))}
           </div>
-        </div>
-
-        <div className="game-scene__weather-card">
-          <span className="game-scene__weather-date">
-            2026-05-09 | {activeWeather.label}
-          </span>
-          <strong className="game-scene__weather-title">窗外</strong>
-          <p className="game-scene__weather-copy">{activeWeather.mood}</p>
         </div>
       </header>
 

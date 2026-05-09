@@ -9,8 +9,21 @@ function IpadIcon({ kind }) {
   if (kind === "journal") {
     return (
       <svg {...commonProps}>
-        <rect x="7" y="5.8" width="10" height="12.4" rx="1.8" stroke="currentColor" strokeWidth="1.5" />
-        <path d="M10 9.2H14M10 12H14M10 14.8H12.7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <rect
+          x="7"
+          y="5.8"
+          width="10"
+          height="12.4"
+          rx="1.8"
+          stroke="currentColor"
+          strokeWidth="1.5"
+        />
+        <path
+          d="M10 9.2H14M10 12H14M10 14.8H12.7"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
       </svg>
     );
   }
@@ -19,7 +32,13 @@ function IpadIcon({ kind }) {
     return (
       <svg {...commonProps}>
         <circle cx="12" cy="12" r="6.2" stroke="currentColor" strokeWidth="1.5" />
-        <path d="M12 9V12.3L14.2 13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        <path
+          d="M12 9V12.3L14.2 13.5"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
       </svg>
     );
   }
@@ -27,7 +46,12 @@ function IpadIcon({ kind }) {
   if (kind === "notes") {
     return (
       <svg {...commonProps}>
-        <path d="M8 6.5H15.5C16.3 6.5 17 7.2 17 8V16.2L14.1 14.4L11.2 16.2L8.3 14.4L7 15.3V8C7 7.2 7.7 6.5 8.5 6.5Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+        <path
+          d="M8 6.5H15.5C16.3 6.5 17 7.2 17 8V16.2L14.1 14.4L11.2 16.2L8.3 14.4L7 15.3V8C7 7.2 7.7 6.5 8.5 6.5Z"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinejoin="round"
+        />
       </svg>
     );
   }
@@ -39,6 +63,14 @@ const IPAD_TABS = [
   { id: "journal", label: "日记", icon: "journal" },
   { id: "memory", label: "记忆", icon: "memory" },
   { id: "notes", label: "草稿", icon: "notes" },
+];
+
+const DAY_STRIP = [
+  { label: "Mon", mood: "平静" },
+  { label: "Tue", mood: "迟钝" },
+  { label: "Wed", mood: "失眠" },
+  { label: "Thu", mood: "空白" },
+  { label: "Fri", mood: "漂浮" },
 ];
 
 export function VirtualIpad({ onClose }) {
@@ -73,6 +105,10 @@ export function VirtualIpad({ onClose }) {
 
         <div className="virtual-ipad__body">
           <aside className="virtual-ipad__sidebar">
+            <div className="virtual-ipad__sidebar-head">
+              <span className="virtual-surface__label">Sections</span>
+            </div>
+
             {IPAD_TABS.map((tab) => (
               <button
                 key={tab.id}
@@ -88,6 +124,15 @@ export function VirtualIpad({ onClose }) {
           </aside>
 
           <div className="virtual-ipad__content">
+            <div className="virtual-ipad__day-strip">
+              {DAY_STRIP.map((day) => (
+                <article key={day.label}>
+                  <strong>{day.label}</strong>
+                  <span>{day.mood}</span>
+                </article>
+              ))}
+            </div>
+
             <article className="virtual-ipad__page">
               <div className="virtual-ipad__page-top">
                 <span>2026 / 05 / 09</span>
@@ -97,6 +142,7 @@ export function VirtualIpad({ onClose }) {
               <p>
                 iPad 这里后续很适合承接日记、状态回顾、记忆碎片、草稿和读书记录。
               </p>
+
               <div className="virtual-ipad__cards">
                 <section>
                   <strong>昨晚残响</strong>
@@ -106,6 +152,16 @@ export function VirtualIpad({ onClose }) {
                   <strong>今日草稿</strong>
                   <p>“如果今天还是一样，那至少让我先把心情整理好。”</p>
                 </section>
+              </div>
+
+              <div className="virtual-ipad__writing-pad">
+                <span className="virtual-surface__label">Draft</span>
+                <p>
+                  我还是会下意识去看手机，确认世界有没有在我睡着的时候继续向前走。
+                </p>
+                <p>
+                  可桌上的每一块屏幕都像在提醒我，醒来并不等于真正开始生活。
+                </p>
               </div>
             </article>
           </div>

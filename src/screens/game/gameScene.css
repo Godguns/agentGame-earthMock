@@ -1043,6 +1043,24 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.18);
   backdrop-filter: blur(16px) saturate(124%);
   -webkit-backdrop-filter: blur(16px) saturate(124%);
+  overflow: hidden;
+}
+
+.virtual-phone__app-icon.has-image,
+.virtual-phone__placeholder-icon.has-image {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 14px 24px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.virtual-phone__app-icon img,
+.virtual-phone__placeholder-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .virtual-phone__app-icon svg,
@@ -1114,6 +1132,7 @@
     linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.06)),
     rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.14);
+  overflow: hidden;
 }
 
 .virtual-phone__placeholder h3 {
@@ -1243,9 +1262,45 @@
 
 .virtual-pc__grid {
   display: grid;
-  grid-template-columns: 1.3fr 0.8fr;
+  grid-template-columns: 108px 1.28fr 0.88fr;
   gap: 18px;
   padding: 0 24px 90px;
+}
+
+.virtual-pc__sidebar {
+  padding: 18px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 28px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 56%),
+    rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(18px) saturate(124%);
+  -webkit-backdrop-filter: blur(18px) saturate(124%);
+}
+
+.virtual-pc__sidebar-head {
+  margin-bottom: 14px;
+}
+
+.virtual-pc__sidebar-icons {
+  display: grid;
+  gap: 10px;
+}
+
+.virtual-pc__sidebar-app {
+  width: 100%;
+  aspect-ratio: 1;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 20px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(var(--scene-strong-rgb), 0.88);
+}
+
+.virtual-pc__sidebar-app svg {
+  width: 18px;
+  height: 18px;
 }
 
 .virtual-pc__window {
@@ -1265,12 +1320,26 @@
 
 .virtual-pc__window--hero {
   min-height: 298px;
+  grid-column: 2;
 }
 
 .virtual-pc__window--hero h3 {
   margin: 0 0 12px;
   font-size: 1.62rem;
   font-weight: 360;
+}
+
+.virtual-pc__window-bar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.virtual-pc__window-bar span {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
 }
 
 .virtual-pc__window h3,
@@ -1308,6 +1377,18 @@
   line-height: 1.85;
 }
 
+.virtual-pc__window--widgets {
+  grid-column: 3;
+}
+
+.virtual-pc__window--files {
+  grid-column: 2;
+}
+
+.virtual-pc__window--feed {
+  grid-column: 3;
+}
+
 .virtual-pc__stats {
   display: grid;
   gap: 14px;
@@ -1330,6 +1411,27 @@
 .virtual-pc__stats span {
   color: rgba(var(--scene-accent-rgb), 0.7);
   font-size: 0.86rem;
+}
+
+.virtual-pc__feed {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.virtual-pc__feed article {
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.virtual-pc__feed strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.virtual-pc__feed p {
+  font-size: 0.88rem;
 }
 
 .virtual-pc__taskbar {
@@ -1429,6 +1531,10 @@
   gap: 10px;
 }
 
+.virtual-ipad__sidebar-head {
+  margin-bottom: 4px;
+}
+
 .virtual-ipad__tab {
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
@@ -1454,6 +1560,31 @@
 .virtual-ipad__content {
   border-radius: 30px;
   padding: 14px;
+}
+
+.virtual-ipad__day-strip {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.virtual-ipad__day-strip article {
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.virtual-ipad__day-strip strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.82rem;
+  font-weight: 450;
+}
+
+.virtual-ipad__day-strip span {
+  color: rgba(var(--scene-accent-rgb), 0.66);
+  font-size: 0.74rem;
 }
 
 .virtual-ipad__page {
@@ -1489,6 +1620,19 @@
   display: block;
   margin-bottom: 8px;
   font-weight: 420;
+}
+
+.virtual-ipad__writing-pad {
+  margin-top: 18px;
+  padding: 18px;
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 62%),
+    rgba(255, 255, 255, 0.04);
+}
+
+.virtual-ipad__writing-pad p + p {
+  margin-top: 14px;
 }
 
 .virtual-ipod {
@@ -1617,6 +1761,228 @@
 .virtual-ipod__sliders input[type="range"] {
   width: 100%;
   accent-color: rgba(255, 255, 255, 0.92);
+}
+
+.virtual-pc--desktop {
+  width: min(1180px, calc(100vw - 32px));
+  height: min(82dvh, 800px);
+  padding: 0;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: linear-gradient(180deg, #b7d2e8 0%, #d7e6f2 100%);
+  box-shadow:
+    0 32px 90px rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.virtual-pc__desktop-shell {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  border-radius: inherit;
+  background:
+    radial-gradient(90% 70% at 62% 54%, rgba(14, 70, 255, 0.96) 0%, rgba(14, 70, 255, 0.88) 18%, rgba(71, 181, 255, 0.9) 35%, transparent 42%),
+    radial-gradient(88% 68% at 70% 60%, rgba(8, 38, 204, 0.95) 0%, rgba(8, 38, 204, 0.72) 20%, transparent 35%),
+    radial-gradient(58% 48% at 54% 64%, rgba(84, 208, 255, 0.86) 0%, rgba(84, 208, 255, 0.18) 30%, transparent 42%),
+    linear-gradient(180deg, #9fc3df 0%, #d9e8f3 100%);
+}
+
+.virtual-pc__desktop-glow {
+  position: absolute;
+  inset: auto;
+  width: 44%;
+  aspect-ratio: 1 / 1;
+  border-radius: 42% 58% 52% 48%;
+  background:
+    radial-gradient(circle at 30% 34%, rgba(117, 218, 255, 0.92), rgba(17, 86, 255, 0.96) 56%, rgba(10, 37, 190, 0.96) 72%, transparent 74%);
+  filter: blur(2px);
+  transform: rotate(-18deg);
+  opacity: 0.96;
+}
+
+.virtual-pc__desktop-glow--left {
+  left: 32%;
+  top: 20%;
+}
+
+.virtual-pc__desktop-glow--right {
+  right: -2%;
+  bottom: -10%;
+  width: 50%;
+  transform: rotate(18deg);
+}
+
+.virtual-pc__close-orb {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 3;
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.virtual-pc__desktop-icons {
+  position: absolute;
+  top: 18px;
+  left: 16px;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(3, 84px);
+  grid-auto-rows: 108px;
+  gap: 6px 18px;
+}
+
+.virtual-pc__desktop-item {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 8px;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.46);
+}
+
+.virtual-pc__desktop-item-icon {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+}
+
+.virtual-pc__desktop-item-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.virtual-pc__desktop-item-label {
+  width: 84px;
+  font-size: 0.72rem;
+  line-height: 1.28;
+  text-align: center;
+  word-break: break-word;
+}
+
+.virtual-pc__taskbar-dock {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  height: 58px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 0 14px;
+  background: rgba(20, 28, 38, 0.76);
+  backdrop-filter: blur(18px) saturate(128%);
+  -webkit-backdrop-filter: blur(18px) saturate(128%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.virtual-pc__taskbar-left,
+.virtual-pc__taskbar-center,
+.virtual-pc__taskbar-right {
+  display: flex;
+  align-items: center;
+}
+
+.virtual-pc__taskbar-left {
+  justify-content: flex-start;
+}
+
+.virtual-pc__taskbar-center {
+  justify-content: center;
+  gap: 8px;
+}
+
+.virtual-pc__taskbar-right {
+  justify-content: flex-end;
+  gap: 14px;
+}
+
+.virtual-pc__dock-pill {
+  min-width: 132px;
+  height: 38px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.88);
+  font: inherit;
+}
+
+.virtual-pc__dock-pill svg {
+  width: 16px;
+  height: 16px;
+}
+
+.virtual-pc__taskbar-icon {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.94);
+}
+
+.virtual-pc__taskbar-icon.is-active::after {
+  content: "";
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  width: 14px;
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  transform: translateX(-50%);
+}
+
+.virtual-pc__taskbar-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.virtual-pc__tray-icons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 0.78rem;
+}
+
+.virtual-pc__tray-meta {
+  display: grid;
+  justify-items: end;
+  color: rgba(255, 255, 255, 0.94);
+  line-height: 1.2;
+}
+
+.virtual-pc__tray-meta strong {
+  font-size: 0.86rem;
+  font-weight: 500;
+}
+
+.virtual-pc__tray-meta span {
+  font-size: 0.72rem;
+  opacity: 0.86;
 }
 
 .eye-transition {
@@ -1972,9 +2338,24 @@
     height: min(82dvh, 760px);
   }
 
-  .virtual-pc__grid {
-    grid-template-columns: 1fr;
-    padding-bottom: 100px;
+  .virtual-pc--desktop {
+    width: calc(100vw - 22px);
+    height: min(82dvh, 780px);
+  }
+
+  .virtual-pc__desktop-icons {
+    grid-template-columns: repeat(3, 74px);
+    grid-auto-rows: 98px;
+    gap: 4px 10px;
+  }
+
+  .virtual-pc__desktop-item-label {
+    width: 74px;
+    font-size: 0.66rem;
+  }
+
+  .virtual-pc__dock-pill {
+    min-width: 110px;
   }
 
   .virtual-ipad {
@@ -2099,6 +2480,75 @@
   .virtual-pc,
   .virtual-ipad {
     width: calc(100vw - 16px);
+  }
+
+  .virtual-pc--desktop {
+    width: calc(100vw - 8px);
+    height: min(84dvh, 760px);
+    border-radius: 20px;
+  }
+
+  .virtual-pc__desktop-icons {
+    left: 10px;
+    top: 12px;
+    grid-template-columns: repeat(2, 70px);
+    grid-auto-rows: 90px;
+    gap: 2px 8px;
+  }
+
+  .virtual-pc__desktop-item-icon {
+    width: 42px;
+    height: 42px;
+  }
+
+  .virtual-pc__desktop-item-label {
+    width: 68px;
+    font-size: 0.62rem;
+  }
+
+  .virtual-pc__taskbar-dock {
+    grid-template-columns: auto 1fr auto;
+    gap: 8px;
+    height: 54px;
+    padding: 0 10px;
+  }
+
+  .virtual-pc__dock-pill {
+    min-width: 0;
+    width: 42px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .virtual-pc__dock-pill span {
+    display: none;
+  }
+
+  .virtual-pc__taskbar-center {
+    gap: 4px;
+  }
+
+  .virtual-pc__taskbar-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .virtual-pc__taskbar-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .virtual-pc__tray-icons {
+    gap: 6px;
+    font-size: 0.66rem;
+  }
+
+  .virtual-pc__tray-meta strong {
+    font-size: 0.74rem;
+  }
+
+  .virtual-pc__tray-meta span {
+    font-size: 0.62rem;
   }
 
   .virtual-pc__topbar,

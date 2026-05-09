@@ -256,6 +256,21 @@
   -webkit-backdrop-filter: blur(0) brightness(1);
 }
 
+.game-scene.is-phone-active .game-scene__art,
+.game-scene.is-phone-active .game-scene__weather-shell,
+.game-scene.is-phone-active .game-scene__status,
+.game-scene.is-phone-active .game-scene__caption,
+.game-scene.is-phone-active .game-scene__back-button {
+  filter: blur(14px) brightness(0.64);
+}
+
+.game-scene.is-phone-active .game-scene__weather-mood {
+  opacity: 1;
+  background:
+    linear-gradient(180deg, rgba(2, 4, 12, 0.52), rgba(3, 6, 12, 0.34)),
+    radial-gradient(circle at 50% 34%, rgba(0, 0, 0, 0.16), transparent 46%);
+}
+
 .game-scene__weather-shell,
 .game-scene__status,
 .game-scene__caption {
@@ -734,6 +749,10 @@
   transform: scale(1.16) rotate(14deg);
 }
 
+.scene-device--iphone.is-pressing .scene-device__image {
+  animation: iphone-device-press 300ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
 .scene-device--pc::after {
   bottom: 0;
   width: 42%;
@@ -873,6 +892,240 @@
     linear-gradient(135deg, rgba(255, 255, 255, 0.06), transparent 70%),
     rgba(255, 255, 255, 0.04);
   transform: translateY(-1px);
+}
+
+.virtual-phone-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 18;
+  display: grid;
+  align-items: end;
+  justify-items: center;
+  pointer-events: none;
+}
+
+.virtual-phone-overlay__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(2, 4, 10, 0.26);
+  pointer-events: auto;
+}
+
+.virtual-phone-overlay__sheet-wrap {
+  position: relative;
+  width: 100%;
+  display: grid;
+  justify-items: center;
+  pointer-events: none;
+}
+
+.virtual-phone-overlay.is-open .virtual-phone-overlay__sheet-wrap {
+  animation: virtual-phone-sheet-in 620ms cubic-bezier(0.2, 0.9, 0.22, 1) both;
+}
+
+.virtual-phone-overlay.is-closing .virtual-phone-overlay__sheet-wrap {
+  animation: virtual-phone-sheet-out 300ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+.virtual-phone {
+  position: relative;
+  width: min(400px, calc(100vw - 36px));
+  height: 85dvh;
+  max-height: 820px;
+  border-radius: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background:
+    radial-gradient(circle at 30% 10%, rgba(255, 255, 255, 0.12), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
+    rgba(9, 12, 20, 0.78);
+  box-shadow:
+    0 26px 80px rgba(0, 0, 0, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 0 24px rgba(196, 214, 255, 0.12);
+  backdrop-filter: blur(26px) saturate(130%);
+  -webkit-backdrop-filter: blur(26px) saturate(130%);
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+.virtual-phone.is-dragging {
+  transition: none;
+}
+
+.virtual-phone.is-settling {
+  transition: transform 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.virtual-phone__handle-zone {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  padding-top: 18px;
+  padding-bottom: 14px;
+  touch-action: none;
+}
+
+.virtual-phone__handle {
+  width: 86px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.24);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+.virtual-phone__screen {
+  position: relative;
+  height: calc(100% - 40px);
+  padding: 6px 18px 22px;
+}
+
+.virtual-phone__home,
+.virtual-phone__app-screen {
+  height: 100%;
+}
+
+.virtual-phone__hero {
+  padding: 8px 8px 20px;
+}
+
+.virtual-phone__eyebrow {
+  margin: 0 0 8px;
+  color: rgba(220, 230, 245, 0.42);
+  font-size: 0.72rem;
+  letter-spacing: 0.24em;
+}
+
+.virtual-phone__title {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 300;
+  letter-spacing: 0.08em;
+}
+
+.virtual-phone__app-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px 14px;
+  padding: 8px 4px 0;
+}
+
+.virtual-phone__app {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  border: 0;
+  background: transparent;
+  color: rgba(241, 245, 252, 0.94);
+  transition: transform 180ms ease;
+}
+
+.virtual-phone__app.is-pressing {
+  animation: phone-app-press 220ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.virtual-phone__app-icon {
+  position: relative;
+  width: 66px;
+  height: 66px;
+  border-radius: 22px;
+  display: grid;
+  place-items: center;
+  color: rgba(247, 249, 255, 0.96);
+  background:
+    radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.22), transparent 42%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.05)),
+    rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 14px 24px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(16px) saturate(124%);
+  -webkit-backdrop-filter: blur(16px) saturate(124%);
+}
+
+.virtual-phone__app-icon svg,
+.virtual-phone__placeholder-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.virtual-phone__app-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, #ff7171, #ff4646);
+  color: #fff;
+  font-size: 0.66rem;
+  font-weight: 600;
+}
+
+.virtual-phone__app-label {
+  font-size: 0.74rem;
+  letter-spacing: 0.06em;
+}
+
+.virtual-phone__app-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 4px 14px;
+}
+
+.virtual-phone__back-action {
+  border: 0;
+  background: transparent;
+  color: rgba(219, 229, 246, 0.88);
+  font: inherit;
+  font-size: 0.86rem;
+}
+
+.virtual-phone__app-topbar-title {
+  color: rgba(219, 229, 246, 0.62);
+  font-size: 0.8rem;
+  letter-spacing: 0.18em;
+}
+
+.virtual-phone__placeholder {
+  height: calc(100% - 54px);
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 14px;
+  text-align: center;
+  padding: 0 24px;
+}
+
+.virtual-phone__placeholder-icon {
+  width: 74px;
+  height: 74px;
+  border-radius: 24px;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.24), transparent 42%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.06)),
+    rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.virtual-phone__placeholder h3 {
+  margin: 0;
+  font-size: 1.08rem;
+  font-weight: 400;
+}
+
+.virtual-phone__placeholder p {
+  margin: 0;
+  color: rgba(219, 229, 246, 0.68);
+  line-height: 1.7;
 }
 
 .eye-transition {
@@ -1122,6 +1375,66 @@
   }
 }
 
+@keyframes iphone-device-press {
+  0% {
+    transform: scale(1.16) rotate(14deg);
+  }
+
+  36% {
+    transform: scale(1.1) rotate(14deg);
+  }
+
+  68% {
+    transform: scale(1.22) rotate(14deg);
+  }
+
+  100% {
+    transform: scale(1.16) rotate(14deg);
+  }
+}
+
+@keyframes virtual-phone-sheet-in {
+  0% {
+    transform: translateY(108%);
+  }
+
+  72% {
+    transform: translateY(-3%);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes virtual-phone-sheet-out {
+  0% {
+    transform: translateY(0);
+  }
+
+  100% {
+    transform: translateY(108%);
+  }
+}
+
+@keyframes phone-app-press {
+  0% {
+    transform: scale(1);
+  }
+
+  40% {
+    transform: scale(0.95);
+  }
+
+  72% {
+    transform: scale(1.03);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
 @media (max-width: 960px) {
   .game-scene__caption {
     bottom: 88px;
@@ -1247,6 +1560,27 @@
     width: 44px;
     min-width: 44px;
     height: 44px;
+  }
+
+  .virtual-phone {
+    width: 100vw;
+    height: 85dvh;
+    border-radius: 32px 32px 0 0;
+  }
+
+  .virtual-phone__screen {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .virtual-phone__app-grid {
+    gap: 16px 12px;
+  }
+
+  .virtual-phone__app-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 20px;
   }
 
   .game-device-panel__sheet {

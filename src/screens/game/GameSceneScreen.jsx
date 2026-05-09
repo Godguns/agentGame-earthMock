@@ -5,6 +5,7 @@ import {
   GAME_SCENE_ASSETS,
   preloadGameSceneAssets,
 } from "./gameSceneAssets";
+import { VirtualPhone } from "./VirtualPhone";
 import "./gameScene.css";
 
 const WEATHER_OPTIONS = [
@@ -250,6 +251,8 @@ export function GameSceneScreen() {
   const [activeWeatherId, setActiveWeatherId] = useState("cloudy");
   const [activeDeviceId, setActiveDeviceId] = useState(null);
   const [controlsExpanded, setControlsExpanded] = useState(false);
+  const [phoneState, setPhoneState] = useState("closed");
+  const [isIphonePressing, setIsIphonePressing] = useState(false);
 
   useEffect(() => {
     preloadGameSceneAssets();
@@ -276,6 +279,11 @@ export function GameSceneScreen() {
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {
+        if (phoneState === "open") {
+          setPhoneState("closing");
+          return;
+        }
+
         if (activeDeviceId) {
           setActiveDeviceId(null);
           return;
@@ -289,7 +297,21 @@ export function GameSceneScreen() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [activeDeviceId, navigate]);
+  }, [activeDeviceId, navigate, phoneState]);
+
+  useEffect(() => {
+    if (phoneState !== "closing") {
+      return undefined;
+    }
+
+    const timerId = window.setTimeout(() => {
+      setPhoneState("closed");
+    }, 320);
+
+    return () => {
+      window.clearTimeout(timerId);
+    };
+  }, [phoneState]);
 
   const activeWeather =
     WEATHER_OPTIONS.find((option) => option.id === activeWeatherId) ??
@@ -299,6 +321,27 @@ export function GameSceneScreen() {
     [activeDeviceId],
   );
   const isDimWeather = ["rain", "snow", "night"].includes(activeWeatherId);
+  const isPhoneVisible = phoneState !== "closed";
+
+  const handlePhoneOpen = () => {
+    if (phase !== "awake" || isPhoneVisible) {
+      return;
+    }
+
+    setIsIphonePressing(true);
+    window.setTimeout(() => {
+      setIsIphonePressing(false);
+    }, 300);
+    setPhoneState("open");
+  };
+
+  const handlePhoneClose = () => {
+    if (phoneState === "closed" || phoneState === "closing") {
+      return;
+    }
+
+    setPhoneState("closing");
+  };
 
   return (
     <main
@@ -306,6 +349,8 @@ export function GameSceneScreen() {
         isDimWeather ? "is-dim-weather" : ""
       } ${
         isLampOn ? "is-lamp-on" : "is-lamp-off"
+      } ${isPhoneVisible ? "is-phone-active" : ""} ${
+        isIphonePressing ? "is-iphone-pressing" : ""
       }`}
     >
       <div className="game-scene__backdrop" />
@@ -331,10 +376,19 @@ export function GameSceneScreen() {
               type="button"
               className={`scene-device scene-device--${device.id} ${
                 phase === "awake" ? "is-awake" : ""
-              } ${activeDeviceId === device.id ? "is-active" : ""}`}
+              } ${activeDeviceId === device.id ? "is-active" : ""} ${
+                device.id === "iphone" && isIphonePressing ? "is-pressing" : ""
+              }`}
               style={device.position}
-              onClick={() => setActiveDeviceId(device.id)}
-              disabled={phase !== "awake"}
+              onClick={() => {
+                if (device.id === "iphone") {
+                  handlePhoneOpen();
+                  return;
+                }
+
+                setActiveDeviceId(device.id);
+              }}
+              disabled={phase !== "awake" || isPhoneVisible}
               aria-label={device.title}
             >
               <span className="scene-device__shine" />
@@ -460,6 +514,8 @@ export function GameSceneScreen() {
           onClose={() => setActiveDeviceId(null)}
         />
       ) : null}
+
+      <VirtualPhone state={phoneState} onClose={handlePhoneClose} />
 
       <div className="eye-transition" aria-hidden="true">
         <div className="eye-transition__lid eye-transition__lid--top" />

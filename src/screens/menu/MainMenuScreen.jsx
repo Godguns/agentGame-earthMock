@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import godgunsAvatar from "../../../godguns.jpg";
 import liwenAvatar from "../../../liwen.jpg";
+import { preloadGameSceneAssets } from "../game/gameSceneAssets";
 
 import "./menu.css";
 
@@ -152,6 +153,10 @@ export function MainMenuScreen() {
 
     return undefined;
   }, [location.state]);
+
+  useEffect(() => {
+    preloadGameSceneAssets();
+  }, []);
 
   useEffect(() => {
     if (!isAboutOpen) {

@@ -14,6 +14,7 @@
 .game-scene__grain,
 .game-scene__art,
 .game-scene__lamp-glow,
+.game-scene__weather-mood,
 .game-scene__vignette,
 .game-scene__focus,
 .game-scene__weather-shell,
@@ -26,6 +27,7 @@
 .game-scene__grain,
 .game-scene__art,
 .game-scene__lamp-glow,
+.game-scene__weather-mood,
 .game-scene__vignette,
 .game-scene__focus {
   inset: 0;
@@ -173,6 +175,54 @@
   filter: blur(34px);
 }
 
+.game-scene__weather-mood {
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0;
+  background:
+    linear-gradient(180deg, rgba(4, 7, 14, 0.18), rgba(4, 7, 14, 0.08)),
+    radial-gradient(circle at 50% 30%, rgba(0, 0, 0, 0.08), transparent 42%);
+  transition: opacity 420ms ease, background 420ms ease;
+}
+
+.game-scene.is-dim-weather .game-scene__weather-mood {
+  opacity: 1;
+}
+
+.game-scene--weather-rain .game-scene__weather-mood {
+  background:
+    linear-gradient(180deg, rgba(10, 16, 28, 0.28), rgba(6, 10, 18, 0.18)),
+    radial-gradient(circle at 50% 28%, rgba(0, 0, 0, 0.12), transparent 44%);
+}
+
+.game-scene--weather-snow .game-scene__weather-mood {
+  background:
+    linear-gradient(180deg, rgba(16, 19, 28, 0.24), rgba(10, 12, 18, 0.14)),
+    radial-gradient(circle at 50% 28%, rgba(0, 0, 0, 0.08), transparent 44%);
+}
+
+.game-scene--weather-night .game-scene__weather-mood {
+  background:
+    linear-gradient(180deg, rgba(5, 8, 20, 0.44), rgba(2, 4, 12, 0.28)),
+    radial-gradient(circle at 50% 24%, rgba(0, 0, 0, 0.18), transparent 46%);
+}
+
+.game-scene.is-dim-weather .game-scene__base {
+  filter: brightness(0.78) saturate(0.84) contrast(0.98) blur(0);
+}
+
+.game-scene.is-dim-weather .game-scene__weather-layer {
+  filter: brightness(0.82) saturate(0.92) contrast(0.98);
+}
+
+.game-scene--weather-night .game-scene__base {
+  filter: brightness(0.68) saturate(0.8) contrast(0.98) blur(0);
+}
+
+.game-scene--weather-night .game-scene__weather-layer {
+  filter: brightness(0.72) saturate(0.88) contrast(1);
+}
+
 .game-scene__vignette {
   pointer-events: none;
   z-index: 4;
@@ -228,66 +278,186 @@
 }
 
 .game-scene__weather-shell {
-  top: clamp(18px, 3vw, 34px);
-  left: clamp(18px, 3vw, 34px);
-  width: min(620px, calc(100vw - 36px));
+  top: clamp(18px, 3vw, 30px);
+  left: 50%;
+  transform: translateX(-50%) translateY(14px);
+  width: min(860px, calc(100vw - 132px));
   display: grid;
-  gap: 10px;
+  justify-items: center;
+  gap: 12px;
 }
 
-.game-scene__weather-bar {
+.game-scene--awake .game-scene__weather-shell,
+.game-scene--settling .game-scene__weather-shell {
+  transform: translateX(-50%) translateY(0);
+}
+
+.game-scene__control-orbs {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 10px;
-  border: 1px solid rgba(var(--scene-accent-rgb), 0.08);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 58%),
-    rgba(var(--scene-shell-rgb), 0.28);
-  backdrop-filter: blur(20px) saturate(110%);
-  -webkit-backdrop-filter: blur(20px) saturate(110%);
-  box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+  transition:
+    padding 240ms ease,
+    background 240ms ease,
+    border-color 240ms ease,
+    box-shadow 240ms ease,
+    backdrop-filter 240ms ease,
+    -webkit-backdrop-filter 240ms ease;
 }
 
-.game-scene__weather-chip {
-  border: 1px solid rgba(var(--scene-accent-rgb), 0.08);
-  background: rgba(255, 255, 255, 0.02);
-  color: rgba(var(--scene-accent-rgb), 0.76);
+.game-scene__control-orbs.is-expanded {
   padding: 8px 12px;
-  font: inherit;
-  font-size: 0.78rem;
-  letter-spacing: 0.12em;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background:
+    radial-gradient(circle at 30% 22%, rgba(255, 255, 255, 0.14), transparent 40%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)),
+    rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(14px) saturate(122%);
+  -webkit-backdrop-filter: blur(14px) saturate(122%);
+  box-shadow:
+    0 16px 34px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.game-scene__control-tray {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  transform: translateX(-10px);
+  pointer-events: none;
+  transition:
+    max-width 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 220ms ease,
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.game-scene__control-tray.is-expanded {
+  max-width: 620px;
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.game-scene__back-button,
+.game-scene__control-orb {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background:
+    radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.16), transparent 42%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.03)),
+    rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px) saturate(118%);
+  -webkit-backdrop-filter: blur(12px) saturate(118%);
+  box-shadow:
+    0 12px 24px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.03);
   transition:
     border-color 180ms ease,
-    color 180ms ease,
     background 180ms ease,
-    transform 180ms ease;
+    transform 180ms ease,
+    box-shadow 180ms ease;
 }
 
-.game-scene__weather-chip:hover,
-.game-scene__weather-chip:focus-visible {
+.game-scene__back-button {
+  position: absolute;
+  top: clamp(18px, 3vw, 30px);
+  left: clamp(18px, 3vw, 30px);
+  z-index: 9;
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+}
+
+.game-scene__control-orb {
+  width: 48px;
+  min-width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 0;
+  color: rgba(var(--scene-accent-rgb), 0.82);
+}
+
+.game-scene__control-orb.is-lamp {
+  color: rgba(var(--lamp-warm-rgb), 0.84);
+}
+
+.game-scene__control-orb:disabled {
+  opacity: 0.45;
+}
+
+.game-scene__control-orb:hover,
+.game-scene__control-orb:focus-visible,
+.game-scene__back-button:hover,
+.game-scene__back-button:focus-visible {
   outline: none;
-  border-color: rgba(var(--scene-accent-rgb), 0.16);
-  color: rgba(var(--scene-strong-rgb), 0.94);
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.05), transparent 70%),
-    rgba(255, 255, 255, 0.03);
   transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.18);
+  background:
+    radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.2), transparent 42%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.04)),
+    rgba(255, 255, 255, 0.08);
 }
 
-.game-scene__weather-chip.is-active {
-  border-color: rgba(var(--scene-accent-rgb), 0.18);
-  color: rgba(var(--scene-strong-rgb), 0.96);
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.07), transparent 70%),
-    rgba(255, 255, 255, 0.04);
-  box-shadow: 0 0 18px rgba(255, 255, 255, 0.05);
+.game-scene__control-orb.is-active {
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow:
+    0 14px 26px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.game-scene__control-orb.is-active.is-lamp {
+  border-color: rgba(var(--lamp-warm-rgb), 0.26);
+  box-shadow:
+    0 14px 26px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 0 14px rgba(var(--lamp-warm-rgb), 0.08);
+}
+
+.game-scene__orb-icon {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+}
+
+.game-scene__orb-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.game-scene__orb-icon svg {
+  width: 100%;
+  height: 100%;
 }
 
 .game-scene__weather-card {
-  width: min(320px, calc(100vw - 36px));
+  justify-self: start;
+  width: min(340px, calc(100vw - 36px));
   padding: 14px 16px 15px;
   border: 1px solid rgba(var(--scene-accent-rgb), 0.1);
   background:
@@ -359,8 +529,7 @@
   line-height: 1.8;
 }
 
-.scene-device,
-.lamp-toggle {
+.scene-device {
   position: absolute;
   border: 0;
   padding: 0;
@@ -373,14 +542,12 @@
     transform 380ms ease;
 }
 
-.scene-device.is-awake,
-.lamp-toggle.is-awake {
+.scene-device.is-awake {
   opacity: 1;
   transform: scale(1);
 }
 
-.scene-device:disabled,
-.lamp-toggle:disabled {
+.scene-device:disabled {
   cursor: default;
 }
 
@@ -421,9 +588,7 @@
 }
 
 .scene-device__frame,
-.scene-device__shine,
-.lamp-toggle__outline,
-.lamp-toggle__pulse {
+.scene-device__shine {
   position: absolute;
   inset: 0;
   border-radius: 26px;
@@ -518,15 +683,13 @@
 
 .scene-device:hover .scene-device__guide,
 .scene-device:focus-visible .scene-device__guide,
-.scene-device.is-active .scene-device__guide,
-.lamp-toggle:hover .lamp-toggle__guide,
-.lamp-toggle:focus-visible .lamp-toggle__guide,
-.lamp-toggle.is-on .lamp-toggle__guide {
+.scene-device.is-active .scene-device__guide {
   opacity: 1;
 }
 
 .scene-device:focus-visible,
-.lamp-toggle:focus-visible {
+.game-scene__back-button:focus-visible,
+.game-scene__control-orb:focus-visible {
   outline: none;
 }
 
@@ -612,72 +775,6 @@
   justify-items: end;
   text-align: right;
   animation-delay: 2100ms;
-}
-
-.lamp-toggle {
-  left: 2.4%;
-  top: 27%;
-  width: 12%;
-  height: 19%;
-  z-index: 9;
-}
-
-.lamp-toggle__outline {
-  border: 1px solid rgba(var(--scene-accent-rgb), 0.05);
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.03), transparent 70%),
-    rgba(255, 255, 255, 0.015);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  opacity: 0;
-  transition:
-    opacity 220ms ease,
-    border-color 220ms ease,
-    background 220ms ease,
-    box-shadow 220ms ease;
-}
-
-.lamp-toggle__pulse {
-  inset: -6px;
-  border: 1px solid rgba(var(--lamp-warm-rgb), 0.14);
-  opacity: 0;
-}
-
-.lamp-toggle__guide {
-  left: 4%;
-  top: 4%;
-}
-
-.lamp-toggle__guide-line {
-  width: 96px;
-  background: linear-gradient(
-    90deg,
-    rgba(var(--lamp-warm-rgb), 0),
-    rgba(var(--lamp-warm-rgb), 0.36) 28%,
-    rgba(var(--lamp-warm-rgb), 0.88)
-  );
-  box-shadow: 0 0 12px rgba(var(--lamp-warm-rgb), 0.2);
-}
-
-.lamp-toggle__guide-copy em {
-  color: rgba(var(--lamp-warm-rgb), 0.66);
-}
-
-.lamp-toggle:hover .lamp-toggle__pulse,
-.lamp-toggle:focus-visible .lamp-toggle__pulse,
-.lamp-toggle.is-on .lamp-toggle__pulse {
-  animation: hotspot-pulse 3.4s ease-in-out infinite;
-}
-
-.lamp-toggle:hover .lamp-toggle__outline,
-.lamp-toggle:focus-visible .lamp-toggle__outline,
-.lamp-toggle.is-on .lamp-toggle__outline {
-  opacity: 1;
-  border-color: rgba(var(--lamp-warm-rgb), 0.22);
-  background:
-    linear-gradient(135deg, rgba(var(--lamp-warm-rgb), 0.08), transparent 70%),
-    rgba(255, 255, 255, 0.03);
-  box-shadow: 0 0 24px rgba(var(--lamp-warm-rgb), 0.14);
 }
 
 .game-device-panel {
@@ -1031,7 +1128,7 @@
   }
 
   .game-scene__weather-shell {
-    width: min(520px, calc(100vw - 36px));
+    width: min(760px, calc(100vw - 108px));
   }
 
   .scene-device__guide {
@@ -1046,16 +1143,12 @@
     right: -30%;
   }
 
-  .lamp-toggle {
-    left: 1.6%;
-    top: 26%;
-    width: 13%;
-    height: 20%;
+  .game-scene__control-orbs {
+    gap: 10px;
   }
 
-  .lamp-toggle__guide {
-    left: 6%;
-    top: 0;
+  .game-scene__control-orbs.is-expanded {
+    padding: 7px 10px;
   }
 
   .game-device-panel__sheet {
@@ -1070,12 +1163,13 @@
 @media (max-width: 720px) {
   .game-scene__weather-shell {
     top: 14px;
-    left: 14px;
-    width: calc(100vw - 28px);
+    left: 50%;
+    width: calc(100vw - 84px);
   }
 
   .game-scene__weather-card {
-    width: auto;
+    justify-self: center;
+    width: min(320px, calc(100vw - 28px));
   }
 
   .game-scene__status {
@@ -1094,25 +1188,21 @@
     height: 100%;
   }
 
-  .scene-device__guide,
-  .lamp-toggle__guide {
+  .scene-device__guide {
     gap: 6px;
     min-width: 78px;
     opacity: 0.72;
   }
 
-  .scene-device__guide-line,
-  .lamp-toggle__guide-line {
+  .scene-device__guide-line {
     width: 54px;
   }
 
-  .scene-device__guide-copy strong,
-  .lamp-toggle__guide-copy strong {
+  .scene-device__guide-copy strong {
     font-size: 0.62rem;
   }
 
-  .scene-device__guide-copy em,
-  .lamp-toggle__guide-copy em {
+  .scene-device__guide-copy em {
     font-size: 0.58rem;
   }
 
@@ -1136,16 +1226,27 @@
     top: -24%;
   }
 
-  .lamp-toggle {
-    left: 1%;
-    top: 24%;
-    width: 15%;
-    height: 18%;
+  .game-scene__back-button {
+    width: 44px;
+    height: 44px;
   }
 
-  .lamp-toggle__guide {
-    left: 8%;
-    top: -8%;
+  .game-scene__control-orbs {
+    gap: 8px;
+  }
+
+  .game-scene__control-orbs.is-expanded {
+    padding: 7px 9px;
+  }
+
+  .game-scene__control-tray.is-expanded {
+    max-width: 360px;
+  }
+
+  .game-scene__control-orb {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
   }
 
   .game-device-panel__sheet {

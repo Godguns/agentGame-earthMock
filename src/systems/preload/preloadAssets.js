@@ -1,3 +1,5 @@
+import { preloadGameSceneAssets } from "../../screens/game/gameSceneAssets";
+
 export function preloadAssets(onProgress) {
   const tasks = [
     () =>
@@ -15,6 +17,7 @@ export function preloadAssets(onProgress) {
           window.requestAnimationFrame(resolve);
         });
       }),
+    () => preloadGameSceneAssets(),
   ];
 
   let completed = 0;

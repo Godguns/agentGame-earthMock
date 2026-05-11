@@ -9,7 +9,7 @@ const PHONE_AUDIO_SETTINGS = {
 };
 
 const PHONE_APPS = [
-  { id: "messages", label: "信息", subtitle: "聊天与提醒", iconType: "image" },
+  { id: "messages", label: "信息", subtitle: "聊天与联系", iconType: "image" },
   { id: "journal", label: "日记", subtitle: "昨日回声", iconType: "vector" },
   { id: "bank", label: "银行", subtitle: "账单同步", iconType: "image" },
   { id: "jobs", label: "招聘", subtitle: "新的机会", iconType: "vector" },
@@ -296,7 +296,7 @@ function NotificationCenter({
         ) : (
           <div className="virtual-phone__notification-empty">
             <strong>现在很安静</strong>
-            <p>新的消息会先经过这里，然后落到你的掌心里。</p>
+            <p>新的消息会先经过这里，然后轻轻落到你的掌心里。</p>
           </div>
         )}
       </div>
@@ -334,14 +334,12 @@ function PhoneHome({ onOpenApp, pressingAppId }) {
   return (
     <section className="virtual-phone__home">
       <header className="virtual-phone__hero">
-        <div className="virtual-phone__hero-topline">
-          <div>
-            <p className="virtual-phone__eyebrow">WORLD ENTRY</p>
-            <h2 className="virtual-phone__title">主屏幕</h2>
-          </div>
+        <div>
+          <p className="virtual-phone__eyebrow">WORLD ENTRY</p>
+          <h2 className="virtual-phone__title">主屏幕</h2>
         </div>
         <p className="virtual-phone__hero-copy">
-          一切真正的消息，都应该先从上方轻轻落下。
+          白天和夜晚都被收进了掌心里，剩下的入口在这里等你点亮。
         </p>
       </header>
 
@@ -374,20 +372,16 @@ function PhoneMessagesApp({
     null;
 
   useEffect(() => {
-    if (!activeConversation) {
-      return;
-    }
-
-    setDraft("");
-  }, [activeConversationId, activeConversation]);
-
-  useEffect(() => {
     if (!activeConversation || !threadRef.current) {
       return;
     }
 
     threadRef.current.scrollTop = threadRef.current.scrollHeight;
   }, [activeConversation]);
+
+  useEffect(() => {
+    setDraft("");
+  }, [activeConversationId]);
 
   const handleSend = () => {
     if (!activeConversation || !draft.trim()) {
@@ -410,6 +404,7 @@ function PhoneMessagesApp({
             返回
           </button>
           <span className="virtual-phone__app-topbar-title">信息</span>
+          <span className="virtual-phone__topbar-spacer" aria-hidden="true" />
         </div>
 
         <div className="virtual-phone__messages-list">
@@ -426,17 +421,17 @@ function PhoneMessagesApp({
                 {conversation.avatarText}
               </span>
               <span className="virtual-phone__messages-body">
-                <strong>{conversation.name}</strong>
+                <span className="virtual-phone__messages-heading">
+                  <strong>{conversation.name}</strong>
+                  <small>{conversation.messages.at(-1)?.time || "刚刚"}</small>
+                </span>
                 <em>{conversation.messages.at(-1)?.text || conversation.subtitle}</em>
               </span>
-              <span className="virtual-phone__messages-meta">
-                <small>{conversation.messages.at(-1)?.time || "刚刚"}</small>
-                {conversation.unreadCount > 0 ? (
-                  <span className="virtual-phone__messages-badge">
-                    {conversation.unreadCount}
-                  </span>
-                ) : null}
-              </span>
+              {conversation.unreadCount > 0 ? (
+                <span className="virtual-phone__messages-badge">
+                  {conversation.unreadCount}
+                </span>
+              ) : null}
             </button>
           ))}
         </div>
@@ -460,6 +455,7 @@ function PhoneMessagesApp({
           </span>
           <small>{activeConversation.subtitle}</small>
         </div>
+        <span className="virtual-phone__topbar-spacer" aria-hidden="true" />
       </div>
 
       <div ref={threadRef} className="virtual-phone__messages-thread">
@@ -510,7 +506,7 @@ function PhoneMessagesApp({
 
 function SettingsApp({ onBack, theme, onSetTheme }) {
   return (
-    <section className="virtual-phone__app-screen">
+    <section className="virtual-phone__app-screen virtual-phone__settings-screen">
       <div className="virtual-phone__app-topbar">
         <button
           type="button"
@@ -520,6 +516,7 @@ function SettingsApp({ onBack, theme, onSetTheme }) {
           返回
         </button>
         <span className="virtual-phone__app-topbar-title">设置</span>
+        <span className="virtual-phone__topbar-spacer" aria-hidden="true" />
       </div>
 
       <div className="virtual-phone__settings-panel">
@@ -549,7 +546,7 @@ function SettingsApp({ onBack, theme, onSetTheme }) {
           >
             <span className="virtual-phone__theme-program-mark">夜</span>
             <strong>夜间主题</strong>
-            <small>更安静，适合把消息和回忆压低声音地读完。</small>
+            <small>更安静，也更适合把消息和回忆低声读完。</small>
           </button>
         </div>
       </div>
@@ -572,6 +569,7 @@ function PlaceholderApp({ appId, onBack }) {
           返回
         </button>
         <span className="virtual-phone__app-topbar-title">{currentApp?.label}</span>
+        <span className="virtual-phone__topbar-spacer" aria-hidden="true" />
       </div>
 
       <div className="virtual-phone__placeholder">
@@ -736,7 +734,10 @@ export function VirtualPhone({ state, onClose }) {
     if (Math.abs(delta) > 10) {
       ignoreStatusbarClickRef.current = true;
     }
-    setNotificationCenterOffset(notificationCenterOpen ? Math.min(0, delta) : Math.max(0, delta));
+
+    setNotificationCenterOffset(
+      notificationCenterOpen ? Math.min(0, delta) : Math.max(0, delta),
+    );
   };
 
   const finishCenterDrag = (event) => {
@@ -756,6 +757,9 @@ export function VirtualPhone({ state, onClose }) {
     }
 
     setNotificationCenterOffset(0);
+    window.setTimeout(() => {
+      ignoreStatusbarClickRef.current = false;
+    }, 0);
   };
 
   const sheetStyle = useMemo(
@@ -803,7 +807,6 @@ export function VirtualPhone({ state, onClose }) {
             onPointerCancel={finishCenterDrag}
             onClick={() => {
               if (ignoreStatusbarClickRef.current) {
-                ignoreStatusbarClickRef.current = false;
                 return;
               }
               setNotificationCenterOpen((current) => !current);

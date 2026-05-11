@@ -2,10 +2,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { usePhoneStore } from "../../app/store/phoneStore";
+import { PersonaProfilePanel } from "./PersonaProfilePanel";
 import {
   GAME_SCENE_ASSETS,
   preloadGameSceneAssets,
 } from "./gameSceneAssets";
+import { buildPersonaProfile, readStoredPersonaAnswers } from "./personaProfile";
 import { VirtualIpad } from "./VirtualIpad";
 import { VirtualIpod } from "./VirtualIpod";
 import { VirtualPc } from "./VirtualPc";
@@ -279,6 +281,10 @@ export function GameSceneScreen() {
   const [controlsExpanded, setControlsExpanded] = useState(false);
   const [phoneState, setPhoneState] = useState("closed");
   const [isIphonePressing, setIsIphonePressing] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [personaProfile, setPersonaProfile] = useState(() =>
+    buildPersonaProfile(readStoredPersonaAnswers() || {}),
+  );
   const activeNotification = usePhoneStore((state) => state.activeNotification);
   const pushMockNotification = usePhoneStore((state) => state.pushMockNotification);
   const dismissNotificationBanner = usePhoneStore(
@@ -342,6 +348,20 @@ export function GameSceneScreen() {
   }, [phoneState, pushMockNotification]);
 
   useEffect(() => {
+    if (phoneState !== "closing") {
+      return undefined;
+    }
+
+    const timerId = window.setTimeout(() => {
+      setPhoneState("closed");
+    }, 320);
+
+    return () => {
+      window.clearTimeout(timerId);
+    };
+  }, [phoneState]);
+
+  useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key !== "Escape") {
         return;
@@ -357,6 +377,17 @@ export function GameSceneScreen() {
         return;
       }
 
+      if (isProfileOpen) {
+        setIsProfileOpen(false);
+        return;
+      }
+
+      if (phase === "awake") {
+        setPersonaProfile(buildPersonaProfile(readStoredPersonaAnswers() || {}));
+        setIsProfileOpen(true);
+        return;
+      }
+
       navigate("/menu");
     };
 
@@ -364,21 +395,7 @@ export function GameSceneScreen() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [activeSurfaceId, navigate, phoneState]);
-
-  useEffect(() => {
-    if (phoneState !== "closing") {
-      return undefined;
-    }
-
-    const timerId = window.setTimeout(() => {
-      setPhoneState("closed");
-    }, 320);
-
-    return () => {
-      window.clearTimeout(timerId);
-    };
-  }, [phoneState]);
+  }, [activeSurfaceId, isProfileOpen, navigate, phase, phoneState]);
 
   const activeWeather =
     WEATHER_OPTIONS.find((option) => option.id === activeWeatherId) ??
@@ -389,10 +406,11 @@ export function GameSceneScreen() {
   );
   const isDimWeather = ["rain", "snow", "night"].includes(activeWeatherId);
   const isPhoneVisible = phoneState !== "closed";
-  const isOverlayActive = isPhoneVisible || activeSurfaceId !== null;
+  const isOverlayActive =
+    isPhoneVisible || activeSurfaceId !== null || isProfileOpen;
 
   const handlePhoneOpen = () => {
-    if (phase !== "awake" || isPhoneVisible) {
+    if (phase !== "awake" || isPhoneVisible || activeSurfaceId || isProfileOpen) {
       return;
     }
 
@@ -409,6 +427,11 @@ export function GameSceneScreen() {
     }
 
     setPhoneState("closing");
+  };
+
+  const handleOpenProfile = () => {
+    setPersonaProfile(buildPersonaProfile(readStoredPersonaAnswers() || {}));
+    setIsProfileOpen(true);
   };
 
   const renderActiveSurface = () => {
@@ -474,9 +497,13 @@ export function GameSceneScreen() {
                   return;
                 }
 
+                if (isOverlayActive) {
+                  return;
+                }
+
                 setActiveSurfaceId(device.id);
               }}
-              disabled={phase !== "awake" || isOverlayActive}
+              disabled={phase !== "awake"}
               aria-label={device.title}
             >
               <span className="scene-device__shine" />
@@ -574,8 +601,12 @@ export function GameSceneScreen() {
               className={`game-scene__control-orb ${
                 activeSurfaceId === "ipod" ? "is-active" : ""
               }`}
-              onClick={() => setActiveSurfaceId("ipod")}
-              disabled={phase !== "awake" || isOverlayActive}
+              onClick={() => {
+                if (!isOverlayActive) {
+                  setActiveSurfaceId("ipod");
+                }
+              }}
+              disabled={phase !== "awake"}
               aria-label="打开音乐播放器"
             >
               <span className="game-scene__orb-icon" aria-hidden="true">
@@ -617,6 +648,15 @@ export function GameSceneScreen() {
         </div>
       </header>
 
+      <button
+        type="button"
+        className="game-scene__profile-trigger"
+        onClick={handleOpenProfile}
+      >
+        <span>Persona Bound</span>
+        <strong>按 Esc 查看人格档案</strong>
+      </button>
+
       <div className="game-scene__status">
         <span>
           状态：刚醒，还没彻底回到现实。台灯
@@ -635,6 +675,13 @@ export function GameSceneScreen() {
 
       {activeSurface ? renderActiveSurface() : null}
       <VirtualPhone state={phoneState} onClose={handlePhoneClose} />
+      {isProfileOpen ? (
+        <PersonaProfilePanel
+          profile={personaProfile}
+          onClose={() => setIsProfileOpen(false)}
+          onOpenSettings={() => navigate("/settings")}
+        />
+      ) : null}
 
       <div className="eye-transition" aria-hidden="true">
         <div className="eye-transition__lid eye-transition__lid--top" />

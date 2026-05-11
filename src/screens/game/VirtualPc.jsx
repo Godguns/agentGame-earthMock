@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
 
+import { useCustomizationStore } from "../../app/store/customizationStore";
+
 function DesktopIconGlyph({ kind }) {
   const commonProps = {
     viewBox: "0 0 24 24",
@@ -597,6 +599,7 @@ export function VirtualPc({ onClose }) {
   const [isStartOpen, setIsStartOpen] = useState(false);
   const [activeWindowId, setActiveWindowId] = useState(null);
   const [quickPanel, setQuickPanel] = useState(null);
+  const pcWallpaper = useCustomizationStore((state) => state.pcWallpaper);
 
   const taskbarState = useMemo(
     () =>
@@ -646,10 +649,18 @@ export function VirtualPc({ onClose }) {
       />
 
       <section className="virtual-pc virtual-pc--desktop">
-        <div className="virtual-pc__desktop-shell">
-          <div className="virtual-pc__desktop-glow virtual-pc__desktop-glow--left" />
-          <div className="virtual-pc__desktop-glow virtual-pc__desktop-glow--right" />
-
+        <div
+          className="virtual-pc__desktop-shell"
+          style={
+            pcWallpaper
+              ? {
+                  backgroundImage: `linear-gradient(180deg, rgba(5, 8, 18, 0.18), rgba(5, 8, 18, 0.28)), url(${pcWallpaper})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }
+              : undefined
+          }
+        >
           <button
             type="button"
             className="virtual-pc__close-orb"

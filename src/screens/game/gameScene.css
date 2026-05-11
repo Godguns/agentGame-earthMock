@@ -727,6 +727,29 @@
     drop-shadow(0 44px 34px rgba(0, 0, 0, 0.08));
 }
 
+.scene-device__wallpaper {
+  position: absolute;
+  pointer-events: none;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 2;
+}
+
+.scene-device--pc .scene-device__wallpaper--pc {
+  left: 20.6%;
+  top: 18.4%;
+  width: 59.1%;
+  height: 70.8%;
+  border-radius: 0.35vw;
+  overflow: hidden;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+    0 6px 18px rgba(0, 0, 0, 0.14);
+  transform: perspective(1000px) rotateX(1deg) scale(.9);
+  opacity: 0.96;
+}
+
 .scene-device--pc .scene-device__guide-line {
   width: 94px;
 }
@@ -5716,6 +5739,185 @@
   cursor: pointer;
   color: rgba(224, 234, 252, 0.9);
   font-weight: 600;
+}
+
+.virtual-phone__settings-screen {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  padding-right: 3px !important;
+  padding-bottom: calc(var(--phone-safe-bottom) + 22px) !important;
+}
+
+.virtual-phone__settings-panel {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 0 0 auto !important;
+  gap: 14px !important;
+  margin-top: 6px !important;
+}
+
+.virtual-phone__theme-program-grid {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 10px !important;
+}
+
+.virtual-phone__theme-program {
+  position: relative !important;
+  display: grid !important;
+  grid-template-columns: 44px minmax(0, 1fr) !important;
+  align-items: start !important;
+  gap: 12px !important;
+  padding: 14px !important;
+  border-radius: 18px !important;
+}
+
+.virtual-phone__theme-program-mark {
+  position: static !important;
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 14px !important;
+  flex-shrink: 0;
+}
+
+.virtual-phone__theme-program-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.virtual-phone__theme-program strong {
+  display: block;
+}
+
+.virtual-phone__theme-program small {
+  display: block;
+}
+
+.virtual-phone__wallpaper-program {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 65%),
+    rgba(223, 232, 247, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 10px 24px rgba(115, 133, 169, 0.05);
+  backdrop-filter: blur(16px) saturate(130%);
+  -webkit-backdrop-filter: blur(16px) saturate(130%);
+}
+
+.virtual-phone__wallpaper-copy {
+  display: grid;
+  gap: 4px;
+}
+
+.virtual-phone__wallpaper-copy strong {
+  color: var(--phone-text-strong);
+  font-size: 0.96rem;
+}
+
+.virtual-phone__wallpaper-copy p {
+  margin: 0;
+  color: var(--phone-text-soft);
+  font-size: 0.8rem;
+  line-height: 1.55;
+}
+
+.virtual-phone__wallpaper-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.virtual-phone__wallpaper-upload,
+.virtual-phone__wallpaper-clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent 65%),
+    rgba(255, 255, 255, 0.08);
+  color: var(--phone-text-strong);
+  font-size: 0.8rem;
+  text-decoration: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+}
+
+.virtual-phone__wallpaper-input {
+  display: none;
+}
+
+.virtual-phone__wallpaper-preview {
+  position: relative;
+  min-height: 92px;
+  border-radius: 16px;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 65%),
+    rgba(214, 224, 241, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.virtual-phone__wallpaper-preview img {
+  display: block;
+  width: 100%;
+  height: 92px;
+  object-fit: cover;
+}
+
+.virtual-phone__wallpaper-preview span {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--phone-text-soft);
+  font-size: 0.8rem;
+}
+
+.virtual-phone__screen {
+  background-size: cover !important;
+  background-position: center !important;
+  overflow: hidden !important;
+}
+
+.virtual-phone__content {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+.virtual-phone__app-screen,
+.virtual-phone__messages-screen {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  min-height: 0 !important;
+}
+
+.virtual-phone--night .virtual-phone__wallpaper-program {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 65%),
+    rgba(18, 25, 39, 0.22);
+  border-color: rgba(163, 185, 232, 0.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 10px 24px rgba(6, 10, 20, 0.18);
 }
 
 .persona-panel__raw pre {

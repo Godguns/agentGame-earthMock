@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { useCustomizationStore } from "../../app/store/customizationStore";
 import { usePhoneStore } from "../../app/store/phoneStore";
 import { GAME_SCENE_ASSETS } from "./gameSceneAssets";
 
@@ -77,6 +78,20 @@ function playPhoneUiSound(kind) {
   oscillator.connect(gain);
   oscillator.start(now);
   oscillator.stop(now + (kind === "close" ? 0.18 : 0.22));
+}
+
+function readImageFile(file, onDone) {
+  if (!file) {
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    if (typeof reader.result === "string") {
+      onDone(reader.result);
+    }
+  };
+  reader.readAsDataURL(file);
 }
 
 function PhoneVectorIcon({ kind }) {
@@ -408,32 +423,37 @@ function PhoneMessagesApp({
         </div>
 
         <div className="virtual-phone__messages-list">
-          {conversations.map((conversation) => (
-            <button
-              key={conversation.id}
-              type="button"
-              className="virtual-phone__messages-item"
-              onClick={() => onSelectConversation(conversation.id)}
-            >
-              <span
-                className={`virtual-phone__messages-avatar virtual-phone__messages-avatar--${conversation.avatarTone}`}
+          {conversations.map((conversation) => {
+            const lastMessage =
+              conversation.messages[conversation.messages.length - 1] || null;
+
+            return (
+              <button
+                key={conversation.id}
+                type="button"
+                className="virtual-phone__messages-item"
+                onClick={() => onSelectConversation(conversation.id)}
               >
-                {conversation.avatarText}
-              </span>
-              <span className="virtual-phone__messages-body">
-                <span className="virtual-phone__messages-heading">
-                  <strong>{conversation.name}</strong>
-                  <small>{conversation.messages.at(-1)?.time || "刚刚"}</small>
+                <span
+                  className={`virtual-phone__messages-avatar virtual-phone__messages-avatar--${conversation.avatarTone}`}
+                >
+                  {conversation.avatarText}
                 </span>
-                <em>{conversation.messages.at(-1)?.text || conversation.subtitle}</em>
-              </span>
-              {conversation.unreadCount > 0 ? (
-                <span className="virtual-phone__messages-badge">
-                  {conversation.unreadCount}
+                <span className="virtual-phone__messages-body">
+                  <span className="virtual-phone__messages-heading">
+                    <strong>{conversation.name}</strong>
+                    <small>{lastMessage?.time || "刚刚"}</small>
+                  </span>
+                  <em>{lastMessage?.text || conversation.subtitle}</em>
                 </span>
-              ) : null}
-            </button>
-          ))}
+                {conversation.unreadCount > 0 ? (
+                  <span className="virtual-phone__messages-badge">
+                    {conversation.unreadCount}
+                  </span>
+                ) : null}
+              </button>
+            );
+          })}
         </div>
       </section>
     );
@@ -494,7 +514,9 @@ function PhoneMessagesApp({
           placeholder="想说点什么，就把它留在这里。"
         />
         <div className="virtual-phone__messages-composer-footer">
-          <span className="virtual-phone__composer-hint">Enter 发送一条新的消息</span>
+          <span className="virtual-phone__composer-hint">
+            Enter 发送一条新的消息
+          </span>
           <button type="button" onClick={handleSend} disabled={!draft.trim()}>
             发送
           </button>
@@ -504,7 +526,67 @@ function PhoneMessagesApp({
   );
 }
 
-function SettingsApp({ onBack, theme, onSetTheme }) {
+function WallpaperSetting({
+  title,
+  description,
+  value,
+  inputId,
+  onUpload,
+  onClear,
+}) {
+  return (
+    <section className="virtual-phone__wallpaper-program">
+      <div className="virtual-phone__wallpaper-copy">
+        <strong>{title}</strong>
+        <p>{description}</p>
+      </div>
+      <div className="virtual-phone__wallpaper-actions">
+        <label className="virtual-phone__wallpaper-upload" htmlFor={inputId}>
+          上传图片
+        </label>
+        <input
+          id={inputId}
+          className="virtual-phone__wallpaper-input"
+          type="file"
+          accept="image/*"
+          onChange={(event) => {
+            const [file] = event.target.files || [];
+            readImageFile(file, onUpload);
+            event.target.value = "";
+          }}
+        />
+        {value ? (
+          <button
+            type="button"
+            className="virtual-phone__wallpaper-clear"
+            onClick={onClear}
+          >
+            恢复默认
+          </button>
+        ) : null}
+      </div>
+      <div className="virtual-phone__wallpaper-preview">
+        {value ? (
+          <img src={value} alt="" aria-hidden="true" />
+        ) : (
+          <span>使用默认壁纸</span>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function SettingsApp({
+  onBack,
+  theme,
+  onSetTheme,
+  phoneWallpaper,
+  pcWallpaper,
+  onSelectPhoneWallpaper,
+  onSelectPcWallpaper,
+  onClearPhoneWallpaper,
+  onClearPcWallpaper,
+}) {
   return (
     <section className="virtual-phone__app-screen virtual-phone__settings-screen">
       <div className="virtual-phone__app-topbar">
@@ -521,8 +603,8 @@ function SettingsApp({ onBack, theme, onSetTheme }) {
 
       <div className="virtual-phone__settings-panel">
         <header className="virtual-phone__settings-header">
-          <strong>外观主题</strong>
-          <p>把白天和夜晚收进同一个程序里，不打扰主屏幕。</p>
+          <strong>外观设置</strong>
+          <p>把主题和壁纸收进一个安静的页面里，慢慢调到你想要的样子。</p>
         </header>
 
         <div className="virtual-phone__theme-program-grid">
@@ -534,9 +616,12 @@ function SettingsApp({ onBack, theme, onSetTheme }) {
             onClick={() => onSetTheme("day")}
           >
             <span className="virtual-phone__theme-program-mark">昼</span>
-            <strong>日间主题</strong>
-            <small>明亮、轻盈，更像白天刚醒来的桌面。</small>
+            <div className="virtual-phone__theme-program-copy">
+              <strong>日间主题</strong>
+              <small>更轻、更透，也更像清晨刚醒来的桌面。</small>
+            </div>
           </button>
+
           <button
             type="button"
             className={`virtual-phone__theme-program ${
@@ -545,10 +630,30 @@ function SettingsApp({ onBack, theme, onSetTheme }) {
             onClick={() => onSetTheme("night")}
           >
             <span className="virtual-phone__theme-program-mark">夜</span>
-            <strong>夜间主题</strong>
-            <small>更安静，也更适合把消息和回忆低声读完。</small>
+            <div className="virtual-phone__theme-program-copy">
+              <strong>夜间主题</strong>
+              <small>更安静，也更适合把消息和回忆低声读完。</small>
+            </div>
           </button>
         </div>
+
+        <WallpaperSetting
+          title="手机桌面壁纸"
+          description="为主屏幕换一张更像你的背景。"
+          value={phoneWallpaper}
+          inputId="phone-wallpaper-input"
+          onUpload={onSelectPhoneWallpaper}
+          onClear={onClearPhoneWallpaper}
+        />
+
+        <WallpaperSetting
+          title="PC 桌面壁纸"
+          description="这张图会同步到桌面电脑界面的背景。"
+          value={pcWallpaper}
+          inputId="pc-wallpaper-input"
+          onUpload={onSelectPcWallpaper}
+          onClear={onClearPcWallpaper}
+        />
       </div>
     </section>
   );
@@ -584,7 +689,7 @@ function PlaceholderApp({ appId, onBack }) {
             <PhoneVectorIcon kind={appId} />
           )}
         </span>
-        <h3>{currentApp?.label} 功能开发中…</h3>
+        <h3>{currentApp?.label}功能开发中...</h3>
         <p>这里后续会承接真实的游戏内系统与交互内容。</p>
       </div>
     </section>
@@ -605,6 +710,7 @@ export function VirtualPhone({ state, onClose }) {
   const centerDragStartYRef = useRef(0);
   const ignoreStatusbarClickRef = useRef(false);
   const sheetRef = useRef(null);
+
   const theme = usePhoneStore((stateValue) => stateValue.theme);
   const conversations = usePhoneStore((stateValue) => stateValue.conversations);
   const notifications = usePhoneStore((stateValue) => stateValue.notifications);
@@ -615,6 +721,17 @@ export function VirtualPhone({ state, onClose }) {
   const setTheme = usePhoneStore((stateValue) => stateValue.setTheme);
   const removeNotification = usePhoneStore(
     (stateValue) => stateValue.removeNotification,
+  );
+
+  const phoneWallpaper = useCustomizationStore(
+    (stateValue) => stateValue.phoneWallpaper,
+  );
+  const pcWallpaper = useCustomizationStore((stateValue) => stateValue.pcWallpaper);
+  const setPhoneWallpaper = useCustomizationStore(
+    (stateValue) => stateValue.setPhoneWallpaper,
+  );
+  const setPcWallpaper = useCustomizationStore(
+    (stateValue) => stateValue.setPcWallpaper,
   );
 
   useEffect(() => {
@@ -769,6 +886,18 @@ export function VirtualPhone({ state, onClose }) {
     [closeDragOffset],
   );
 
+  const screenStyle = useMemo(() => {
+    if (currentAppId || !phoneWallpaper) {
+      return undefined;
+    }
+
+    return {
+      backgroundImage: `linear-gradient(180deg, rgba(247, 249, 255, 0.42), rgba(236, 241, 250, 0.38)), url(${phoneWallpaper})`,
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+    };
+  }, [currentAppId, phoneWallpaper]);
+
   if (state === "closed") {
     return null;
   }
@@ -832,7 +961,7 @@ export function VirtualPhone({ state, onClose }) {
             onPointerCancel={finishCenterDrag}
           />
 
-          <div className="virtual-phone__screen">
+          <div className="virtual-phone__screen" style={screenStyle}>
             <div className="virtual-phone__content">
               {!currentAppId ? (
                 <PhoneHome
@@ -853,9 +982,18 @@ export function VirtualPhone({ state, onClose }) {
                   onBack={() => setCurrentAppId(null)}
                   theme={theme}
                   onSetTheme={setTheme}
+                  phoneWallpaper={phoneWallpaper}
+                  pcWallpaper={pcWallpaper}
+                  onSelectPhoneWallpaper={setPhoneWallpaper}
+                  onSelectPcWallpaper={setPcWallpaper}
+                  onClearPhoneWallpaper={() => setPhoneWallpaper("")}
+                  onClearPcWallpaper={() => setPcWallpaper("")}
                 />
               ) : (
-                <PlaceholderApp appId={currentAppId} onBack={() => setCurrentAppId(null)} />
+                <PlaceholderApp
+                  appId={currentAppId}
+                  onBack={() => setCurrentAppId(null)}
+                />
               )}
             </div>
           </div>

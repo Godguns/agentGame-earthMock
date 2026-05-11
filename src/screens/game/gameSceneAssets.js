@@ -2,7 +2,7 @@ export const GAME_SCENE_ASSETS = {
   ipad: "https://i.imgant.com/v2/5sh5jII.png",
   iphone: "https://i.imgant.com/v2/RzOwmIE.png",
   ipod: "https://i.imgant.com/v2/zk63zxN.png",
-  pc: "https://i.imgant.com/v2/bNdw33n.png",
+  pc: "https://i.imgant.com/v2/D6XQ04F.png",
   phoneAppChat: "https://i.imgant.com/v2/pE8pu5I.jpeg",
   phoneAppBank: "https://i.imgant.com/v2/VLBu5Kn.jpeg",
   phoneAppPlayer: "https://i.imgant.com/v2/ZJVxO8V.jpeg",

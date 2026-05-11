@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { useCustomizationStore } from "../../app/store/customizationStore";
 import { usePhoneStore } from "../../app/store/phoneStore";
 import { PersonaProfilePanel } from "./PersonaProfilePanel";
 import {
@@ -285,6 +286,7 @@ export function GameSceneScreen() {
   const [personaProfile, setPersonaProfile] = useState(() =>
     buildPersonaProfile(readStoredPersonaAnswers() || {}),
   );
+  const pcWallpaper = useCustomizationStore((state) => state.pcWallpaper);
   const activeNotification = usePhoneStore((state) => state.activeNotification);
   const pushMockNotification = usePhoneStore((state) => state.pushMockNotification);
   const dismissNotificationBanner = usePhoneStore(
@@ -508,6 +510,13 @@ export function GameSceneScreen() {
             >
               <span className="scene-device__shine" />
               <span className="scene-device__frame" />
+              {device.id === "pc" && pcWallpaper ? (
+                <span
+                  className="scene-device__wallpaper scene-device__wallpaper--pc"
+                  style={{ backgroundImage: `url(${pcWallpaper})` }}
+                  aria-hidden="true"
+                />
+              ) : null}
               <img
                 className="scene-device__image"
                 src={device.image}

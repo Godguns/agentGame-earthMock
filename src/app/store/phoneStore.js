@@ -200,20 +200,15 @@ export const usePhoneStore = create((set, get) => ({
     dismissActiveBanner(set);
   },
   removeNotification: (notificationId) => {
-    set((state) => {
-      const nextNotifications = state.notifications.filter(
+    set((state) => ({
+      notifications: state.notifications.filter(
         (notification) => notification.id !== notificationId,
-      );
-      const nextActiveNotification =
+      ),
+      activeNotification:
         state.activeNotification?.id === notificationId
           ? null
-          : state.activeNotification;
-
-      return {
-        notifications: nextNotifications,
-        activeNotification: nextActiveNotification,
-      };
-    });
+          : state.activeNotification,
+    }));
   },
   markConversationRead: (conversationId) => {
     set((state) => ({

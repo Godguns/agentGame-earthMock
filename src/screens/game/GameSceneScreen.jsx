@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { usePhoneStore } from "../../app/store/phoneStore";
 import {
   GAME_SCENE_ASSETS,
   preloadGameSceneAssets,
@@ -10,6 +11,8 @@ import { VirtualIpod } from "./VirtualIpod";
 import { VirtualPc } from "./VirtualPc";
 import { VirtualPhone } from "./VirtualPhone";
 import "./gameScene.css";
+
+const MOCK_NOTIFICATION_INTERVAL_MS = 3 * 60 * 1000;
 
 const WEATHER_OPTIONS = [
   {
@@ -34,7 +37,7 @@ const WEATHER_OPTIONS = [
     id: "rain",
     label: "雨天",
     image: GAME_SCENE_ASSETS.weatherRain,
-    mood: "玻璃外面很安静，只剩下雨在替你说话。",
+    mood: "玻璃外面很安静，只剩雨在替你说话。",
   },
   {
     id: "snow",
@@ -266,6 +269,9 @@ function OrbIcon({ kind }) {
 
 export function GameSceneScreen() {
   const navigate = useNavigate();
+  const notificationLoopStartedRef = useRef(false);
+  const sceneEntryNotificationSentRef = useRef(false);
+  const phoneOpenNotifiedRef = useRef(false);
   const [phase, setPhase] = useState("closed");
   const [isLampOn, setIsLampOn] = useState(true);
   const [activeWeatherId, setActiveWeatherId] = useState("cloudy");
@@ -273,6 +279,11 @@ export function GameSceneScreen() {
   const [controlsExpanded, setControlsExpanded] = useState(false);
   const [phoneState, setPhoneState] = useState("closed");
   const [isIphonePressing, setIsIphonePressing] = useState(false);
+  const activeNotification = usePhoneStore((state) => state.activeNotification);
+  const pushMockNotification = usePhoneStore((state) => state.pushMockNotification);
+  const dismissNotificationBanner = usePhoneStore(
+    (state) => state.dismissNotificationBanner,
+  );
 
   useEffect(() => {
     preloadGameSceneAssets();
@@ -295,6 +306,40 @@ export function GameSceneScreen() {
       window.clearTimeout(awakeTimerId);
     };
   }, []);
+
+  useEffect(() => {
+    if (notificationLoopStartedRef.current) {
+      return undefined;
+    }
+
+    notificationLoopStartedRef.current = true;
+    const timerId = window.setInterval(() => {
+      pushMockNotification();
+    }, MOCK_NOTIFICATION_INTERVAL_MS);
+
+    return () => {
+      window.clearInterval(timerId);
+    };
+  }, [pushMockNotification]);
+
+  useEffect(() => {
+    if (phase === "awake" && !sceneEntryNotificationSentRef.current) {
+      pushMockNotification();
+      sceneEntryNotificationSentRef.current = true;
+    }
+  }, [phase, pushMockNotification]);
+
+  useEffect(() => {
+    if (phoneState === "open" && !phoneOpenNotifiedRef.current) {
+      pushMockNotification();
+      phoneOpenNotifiedRef.current = true;
+      return;
+    }
+
+    if (phoneState === "closed") {
+      phoneOpenNotifiedRef.current = false;
+    }
+  }, [phoneState, pushMockNotification]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -470,10 +515,31 @@ export function GameSceneScreen() {
         </span>
       </button>
 
+      {activeNotification ? (
+        <div className="game-scene__notification-banner" role="status" aria-live="polite">
+          <span className="game-scene__notification-icon">
+            {activeNotification.title.slice(0, 1)}
+          </span>
+          <span className="game-scene__notification-copy">
+            <strong>{activeNotification.title}</strong>
+            <span>{activeNotification.body}</span>
+          </span>
+          <small>{activeNotification.time}</small>
+          <button
+            type="button"
+            className="game-scene__notification-close"
+            onClick={dismissNotificationBanner}
+            aria-label="关闭通知"
+          >
+            ×
+          </button>
+        </div>
+      ) : null}
+
       <header className="game-scene__weather-shell">
         <div className="game-scene__weather-card">
           <span className="game-scene__weather-date">
-            2026-05-09 | {activeWeather.label}
+            2026-05-11 | {activeWeather.label}
           </span>
           <strong className="game-scene__weather-title">窗外</strong>
           <p className="game-scene__weather-copy">{activeWeather.mood}</p>
@@ -561,7 +627,9 @@ export function GameSceneScreen() {
       <div className="game-scene__caption">
         <p>
           你醒了。桌上的屏幕都还亮着，
-          {isLampOn ? "灯光把桌角照得很安静。" : "房间只剩窗外和屏幕在发光。"}
+          {isLampOn
+            ? "灯光把桌角照得很安静。"
+            : "房间只剩窗外和屏幕在发光。"}
         </p>
       </div>
 

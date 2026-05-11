@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { useCustomizationStore } from "../../app/store/customizationStore";
+import {
+  DEFAULT_PC_WALLPAPER,
+  useCustomizationStore,
+} from "../../app/store/customizationStore";
 import { usePhoneStore } from "../../app/store/phoneStore";
 import { GAME_SCENE_ASSETS } from "./gameSceneAssets";
 
@@ -530,6 +533,7 @@ function WallpaperSetting({
   title,
   description,
   value,
+  showClear = Boolean(value),
   inputId,
   onUpload,
   onClear,
@@ -555,7 +559,7 @@ function WallpaperSetting({
             event.target.value = "";
           }}
         />
-        {value ? (
+        {showClear ? (
           <button
             type="button"
             className="virtual-phone__wallpaper-clear"
@@ -649,7 +653,8 @@ function SettingsApp({
         <WallpaperSetting
           title="PC 桌面壁纸"
           description="这张图会同步到桌面电脑界面的背景。"
-          value={pcWallpaper}
+          value={pcWallpaper || DEFAULT_PC_WALLPAPER}
+          showClear={Boolean(pcWallpaper)}
           inputId="pc-wallpaper-input"
           onUpload={onSelectPcWallpaper}
           onClear={onClearPcWallpaper}

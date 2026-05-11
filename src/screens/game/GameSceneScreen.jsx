@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { useCustomizationStore } from "../../app/store/customizationStore";
+import {
+  DEFAULT_PC_WALLPAPER,
+  useCustomizationStore,
+} from "../../app/store/customizationStore";
 import { usePhoneStore } from "../../app/store/phoneStore";
 import { PersonaProfilePanel } from "./PersonaProfilePanel";
 import {
@@ -287,6 +290,7 @@ export function GameSceneScreen() {
     buildPersonaProfile(readStoredPersonaAnswers() || {}),
   );
   const pcWallpaper = useCustomizationStore((state) => state.pcWallpaper);
+  const resolvedPcWallpaper = pcWallpaper || DEFAULT_PC_WALLPAPER;
   const activeNotification = usePhoneStore((state) => state.activeNotification);
   const pushMockNotification = usePhoneStore((state) => state.pushMockNotification);
   const dismissNotificationBanner = usePhoneStore(
@@ -510,10 +514,10 @@ export function GameSceneScreen() {
             >
               <span className="scene-device__shine" />
               <span className="scene-device__frame" />
-              {device.id === "pc" && pcWallpaper ? (
+              {device.id === "pc" ? (
                 <span
                   className="scene-device__wallpaper scene-device__wallpaper--pc"
-                  style={{ backgroundImage: `url(${pcWallpaper})` }}
+                  style={{ backgroundImage: `url(${resolvedPcWallpaper})` }}
                   aria-hidden="true"
                 />
               ) : null}

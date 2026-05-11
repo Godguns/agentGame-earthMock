@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
 const STORAGE_KEY = "earth-online-customization";
+export const DEFAULT_PC_WALLPAPER = "https://i.imgant.com/v2/gnWrJU2.png";
 
 function readStoredCustomization() {
   if (typeof window === "undefined") {

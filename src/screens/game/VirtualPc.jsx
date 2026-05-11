@@ -1,6 +1,9 @@
 import { useMemo, useState } from "react";
 
-import { useCustomizationStore } from "../../app/store/customizationStore";
+import {
+  DEFAULT_PC_WALLPAPER,
+  useCustomizationStore,
+} from "../../app/store/customizationStore";
 
 function DesktopIconGlyph({ kind }) {
   const commonProps = {
@@ -600,6 +603,7 @@ export function VirtualPc({ onClose }) {
   const [activeWindowId, setActiveWindowId] = useState(null);
   const [quickPanel, setQuickPanel] = useState(null);
   const pcWallpaper = useCustomizationStore((state) => state.pcWallpaper);
+  const resolvedPcWallpaper = pcWallpaper || DEFAULT_PC_WALLPAPER;
 
   const taskbarState = useMemo(
     () =>
@@ -651,15 +655,11 @@ export function VirtualPc({ onClose }) {
       <section className="virtual-pc virtual-pc--desktop">
         <div
           className="virtual-pc__desktop-shell"
-          style={
-            pcWallpaper
-              ? {
-                  backgroundImage: `linear-gradient(180deg, rgba(5, 8, 18, 0.18), rgba(5, 8, 18, 0.28)), url(${pcWallpaper})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                }
-              : undefined
-          }
+          style={{
+            backgroundImage: `linear-gradient(180deg, rgba(5, 8, 18, 0.18), rgba(5, 8, 18, 0.28)), url(${resolvedPcWallpaper})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
         >
           <button
             type="button"

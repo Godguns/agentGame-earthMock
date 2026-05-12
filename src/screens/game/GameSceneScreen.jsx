@@ -68,7 +68,7 @@ const DEVICES = [
     note: "工作台入口",
     position: {
       left: "32.9%",
-      top: "34.7%",
+      top: "28.6%",
       width: "47.8%",
       height: "42.6%",
     },
@@ -81,7 +81,7 @@ const DEVICES = [
     note: "记忆与日记",
     position: {
       left: "24.5%",
-      top: "79.6%",
+      top: "71.9%",
       width: "31.2%",
       height: "27.4%",
     },
@@ -94,7 +94,7 @@ const DEVICES = [
     note: "外部世界入口",
     position: {
       left: "59.1%",
-      top: "82.9%",
+      top: "78.7%",
       width: "8.4%",
       height: "12.2%",
     },
@@ -470,6 +470,7 @@ export function GameSceneScreen() {
       <div className="game-scene__grain" />
 
       <div className="game-scene__art">
+        <div className="game-scene__artboard">
         <img
           key={activeWeather.id}
           className="game-scene__weather-layer"
@@ -515,18 +516,26 @@ export function GameSceneScreen() {
               <span className="scene-device__shine" />
               <span className="scene-device__frame" />
               {device.id === "pc" ? (
-                <span
-                  className="scene-device__wallpaper scene-device__wallpaper--pc"
-                  style={{ backgroundImage: `url(${resolvedPcWallpaper})` }}
+                <span className="scene-device__pc-shell" aria-hidden="true">
+                  <span
+                    className="scene-device__wallpaper scene-device__wallpaper--pc"
+                    style={{ backgroundImage: `url(${resolvedPcWallpaper})` }}
+                  />
+                  <img
+                    className="scene-device__image"
+                    src={device.image}
+                    alt=""
+                  />
+                </span>
+              ) : null}
+              {device.id !== "pc" ? (
+                <img
+                  className="scene-device__image"
+                  src={device.image}
+                  alt=""
                   aria-hidden="true"
                 />
               ) : null}
-              <img
-                className="scene-device__image"
-                src={device.image}
-                alt=""
-                aria-hidden="true"
-              />
               <span className="scene-device__guide" aria-hidden="true">
                 <span className="scene-device__guide-line" />
                 <span className="scene-device__guide-copy">
@@ -536,6 +545,7 @@ export function GameSceneScreen() {
               </span>
             </button>
           ))}
+        </div>
         </div>
       </div>
 

@@ -1,3 +1,5 @@
+import { getLocationSelection } from "../../data/locationCatalog";
+
 const SETTINGS_STORAGE_KEY = "earth-online-settings";
 
 function stripOptionPrefix(value) {
@@ -180,6 +182,7 @@ function buildSignals(cleaned) {
 
 function buildCleanedAnswers(rawAnswers = {}) {
   const birthDate = rawAnswers.birthDate || null;
+  const currentLocation = getLocationSelection(rawAnswers.currentCity);
 
   return {
     birthDate,
@@ -212,6 +215,14 @@ function buildCleanedAnswers(rawAnswers = {}) {
     smallEmergencyCash: normalizeSingleValue(rawAnswers.smallEmergencyCash),
     careerStatus: normalizeSingleValue(rawAnswers.careerStatus),
     carryItem: normalizeSingleValue(rawAnswers.carryItem),
+    currentCity:
+      rawAnswers.currentCity && typeof rawAnswers.currentCity === "object"
+        ? {
+            provinceId: rawAnswers.currentCity.provinceId || "",
+            cityId: rawAnswers.currentCity.cityId || "",
+          }
+        : { provinceId: "", cityId: "" },
+    currentLocation,
     playerName:
       typeof rawAnswers.playerName === "string" && rawAnswers.playerName.trim()
         ? rawAnswers.playerName.trim()
@@ -241,7 +252,7 @@ export function buildPersonaProfile(rawAnswers = {}) {
   const signals = buildSignals(cleaned);
 
   return {
-    profileVersion: 1,
+    profileVersion: 2,
     boundAt: new Date().toISOString(),
     identity: {
       name: cleaned.playerName,
@@ -249,12 +260,15 @@ export function buildPersonaProfile(rawAnswers = {}) {
       age,
       careerStatus: cleaned.careerStatus,
       carryItem: cleaned.carryItem,
+      location: cleaned.currentLocation,
     },
     anchors: {
       origin: {
         birthplace: cleaned.birthplaceTier,
         familyType: cleaned.familyType,
         familyExpectation: cleaned.familyExpectation,
+        currentCity: cleaned.currentLocation?.city || "",
+        currentProvince: cleaned.currentLocation?.province || "",
       },
       body: {
         feedback: cleaned.bodyFeedback,
@@ -286,6 +300,9 @@ export function buildPersonaProfile(rawAnswers = {}) {
     saveModel,
     tags,
     signals,
-    rawAnswers: cleaned,
+    rawAnswers: {
+      ...cleaned,
+      currentCity: cleaned.currentCity,
+    },
   };
 }

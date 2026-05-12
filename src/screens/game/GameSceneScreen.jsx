@@ -5,7 +5,13 @@ import {
   DEFAULT_PC_WALLPAPER,
   useCustomizationStore,
 } from "../../app/store/customizationStore";
+import { hasBoundPersona, useAuthStore } from "../../app/store/authStore";
 import { usePhoneStore } from "../../app/store/phoneStore";
+import {
+  fetchLiveWeather,
+  getWeatherDisplayName,
+} from "../../services/openMeteoWeather";
+import { pollMessages, triggerRandomMessage } from "../../services/earthMockApi";
 import { PersonaProfilePanel } from "./PersonaProfilePanel";
 import {
   GAME_SCENE_ASSETS,
@@ -19,6 +25,7 @@ import { VirtualPhone } from "./VirtualPhone";
 import "./gameScene.css";
 
 const MOCK_NOTIFICATION_INTERVAL_MS = 3 * 60 * 1000;
+const WEATHER_REFRESH_INTERVAL_MS = 20 * 60 * 1000;
 
 const WEATHER_OPTIONS = [
   {
@@ -113,6 +120,26 @@ const DEVICES = [
     },
   },
 ];
+
+function resolvePersonaProfile(persona) {
+  if (persona?.raw_settings?.profileVersion) {
+    return persona.raw_settings;
+  }
+
+  return buildPersonaProfile(readStoredPersonaAnswers() || {});
+}
+
+function resolveWeatherLocation(profile) {
+  return profile?.identity?.location || profile?.rawAnswers?.currentLocation || null;
+}
+
+function formatWeatherTimestamp(value) {
+  if (typeof value !== "string" || !value) {
+    return "";
+  }
+
+  return value.replace("T", " · ");
+}
 
 function OrbIcon({ kind }) {
   const commonProps = {
@@ -253,6 +280,51 @@ function OrbIcon({ kind }) {
     );
   }
 
+  if (kind === "refresh") {
+    return (
+      <svg {...commonProps}>
+        <path
+          d="M18 8.5A6.5 6.5 0 0 0 7.6 6.2"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M7.6 6.2H11"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+        />
+        <path
+          d="M7.6 6.2V9.5"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+        />
+        <path
+          d="M6 15.5A6.5 6.5 0 0 0 16.4 17.8"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M16.4 17.8H13"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+        />
+        <path
+          d="M16.4 17.8V14.5"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  }
+
   if (kind === "music") {
     return (
       <svg {...commonProps}>
@@ -278,9 +350,12 @@ export function GameSceneScreen() {
   const notificationLoopStartedRef = useRef(false);
   const sceneEntryNotificationSentRef = useRef(false);
   const phoneOpenNotifiedRef = useRef(false);
+  const messageCursorRef = useRef(null);
+  const personaSyncedRef = useRef(false);
   const [phase, setPhase] = useState("closed");
   const [isLampOn, setIsLampOn] = useState(true);
   const [activeWeatherId, setActiveWeatherId] = useState("cloudy");
+  const [weatherRefreshToken, setWeatherRefreshToken] = useState(0);
   const [activeSurfaceId, setActiveSurfaceId] = useState(null);
   const [controlsExpanded, setControlsExpanded] = useState(false);
   const [phoneState, setPhoneState] = useState("closed");
@@ -291,11 +366,59 @@ export function GameSceneScreen() {
   );
   const pcWallpaper = useCustomizationStore((state) => state.pcWallpaper);
   const resolvedPcWallpaper = pcWallpaper || DEFAULT_PC_WALLPAPER;
+  const authToken = useAuthStore((state) => state.token);
+  const persona = useAuthStore((state) => state.persona);
+  const loadPersona = useAuthStore((state) => state.loadPersona);
+  const syncPersona = useAuthStore((state) => state.syncPersona);
   const activeNotification = usePhoneStore((state) => state.activeNotification);
+  const ingestServerMessages = usePhoneStore(
+    (state) => state.ingestServerMessages,
+  );
   const pushMockNotification = usePhoneStore((state) => state.pushMockNotification);
   const dismissNotificationBanner = usePhoneStore(
     (state) => state.dismissNotificationBanner,
   );
+  const [weatherState, setWeatherState] = useState({
+    status: "idle",
+    sceneId: "cloudy",
+    cityLabel: "",
+    locationLabel: "",
+    temperature: null,
+    apparentTemperature: null,
+    updatedAt: "",
+    mood: "Weather sync will begin after the scene wakes up.",
+  });
+  const resolvedPersonaProfile = useMemo(
+    () => resolvePersonaProfile(persona),
+    [persona],
+  );
+  const weatherLocation = useMemo(
+    () => resolveWeatherLocation(resolvedPersonaProfile),
+    [resolvedPersonaProfile],
+  );
+
+  useEffect(() => {
+    if (!authToken) {
+      navigate("/menu");
+      return undefined;
+    }
+
+    if (!hasBoundPersona(persona)) {
+      loadPersona().then((nextPersona) => {
+        if (!hasBoundPersona(nextPersona)) {
+          navigate("/settings", {
+            state: {
+              from: "menu",
+              purpose: "onboarding",
+              redirectTo: "/game",
+            },
+          });
+        }
+      });
+    }
+
+    return undefined;
+  }, [authToken, loadPersona, navigate, persona]);
 
   useEffect(() => {
     preloadGameSceneAssets();
@@ -320,6 +443,10 @@ export function GameSceneScreen() {
   }, []);
 
   useEffect(() => {
+    if (authToken) {
+      return undefined;
+    }
+
     if (notificationLoopStartedRef.current) {
       return undefined;
     }
@@ -331,19 +458,168 @@ export function GameSceneScreen() {
 
     return () => {
       window.clearInterval(timerId);
+      notificationLoopStartedRef.current = false;
     };
-  }, [pushMockNotification]);
+  }, [authToken, pushMockNotification]);
+
+  useEffect(() => {
+    if (!authToken) {
+      return undefined;
+    }
+
+    let cancelled = false;
+
+    const pullMessages = async () => {
+      try {
+        const response = await pollMessages(
+          {
+            since: messageCursorRef.current,
+            limit: 80,
+          },
+          authToken,
+        );
+
+        if (cancelled) {
+          return;
+        }
+
+        ingestServerMessages(response?.items || []);
+
+        if (response?.server_time) {
+          messageCursorRef.current = response.server_time;
+        }
+      } catch (error) {
+        console.warn("Failed to poll game messages.", error);
+      }
+    };
+
+    pullMessages();
+    const timerId = window.setInterval(pullMessages, 15000);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(timerId);
+    };
+  }, [authToken, ingestServerMessages]);
+
+  useEffect(() => {
+    if (
+      !authToken ||
+      personaSyncedRef.current ||
+      hasBoundPersona(persona) ||
+      !resolvedPersonaProfile?.identity?.location?.city
+    ) {
+      return undefined;
+    }
+
+    personaSyncedRef.current = true;
+    syncPersona(resolvedPersonaProfile).catch((error) => {
+      personaSyncedRef.current = false;
+      console.warn("Failed to bind persona profile on scene entry.", error);
+    });
+
+    return undefined;
+  }, [authToken, persona, resolvedPersonaProfile, syncPersona]);
+
+  useEffect(() => {
+    setPersonaProfile(resolvedPersonaProfile);
+  }, [resolvedPersonaProfile]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    if (!weatherLocation) {
+      setWeatherState((current) => ({
+        ...current,
+        status: "missing",
+        cityLabel: "",
+        locationLabel: "城市未设置",
+        updatedAt: "",
+        mood: "先在 Persona 标定里完成当前城市，窗外天气才会开始同步。",
+      }));
+      setActiveWeatherId("cloudy");
+      return undefined;
+    }
+
+    const syncWeather = async (isManual = false) => {
+      setWeatherState((current) => ({
+        ...current,
+        status: isManual ? "refreshing" : "loading",
+        locationLabel: weatherLocation.label || `${weatherLocation.province} · ${weatherLocation.city}`,
+        cityLabel: weatherLocation.city || "",
+      }));
+
+      try {
+        const liveWeather = await fetchLiveWeather(weatherLocation);
+        if (cancelled) {
+          return;
+        }
+
+        setActiveWeatherId(liveWeather.sceneId);
+        setWeatherState({
+          status: "ready",
+          ...liveWeather,
+        });
+      } catch (error) {
+        if (cancelled) {
+          return;
+        }
+
+        console.warn("Failed to sync live weather.", error);
+        setWeatherState((current) => ({
+          ...current,
+          status: "error",
+          locationLabel:
+            weatherLocation.label || `${weatherLocation.province} · ${weatherLocation.city}`,
+          cityLabel: weatherLocation.city || "",
+          mood: "实时天气暂时没有连上，窗外场景先保持当前氛围。",
+        }));
+      }
+    };
+
+    syncWeather(weatherRefreshToken > 0);
+    const timerId = window.setInterval(() => {
+      syncWeather(true);
+    }, WEATHER_REFRESH_INTERVAL_MS);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(timerId);
+    };
+  }, [weatherLocation, weatherRefreshToken]);
 
   useEffect(() => {
     if (phase === "awake" && !sceneEntryNotificationSentRef.current) {
-      pushMockNotification();
+      if (authToken) {
+        triggerRandomMessage(authToken)
+          .then((response) => {
+            ingestServerMessages(response?.created || []);
+          })
+          .catch((error) => {
+            console.warn("Failed to trigger entry message.", error);
+            pushMockNotification();
+          });
+      } else {
+        pushMockNotification();
+      }
       sceneEntryNotificationSentRef.current = true;
     }
-  }, [phase, pushMockNotification]);
+  }, [authToken, ingestServerMessages, phase, pushMockNotification]);
 
   useEffect(() => {
     if (phoneState === "open" && !phoneOpenNotifiedRef.current) {
-      pushMockNotification();
+      if (authToken) {
+        triggerRandomMessage(authToken)
+          .then((response) => {
+            ingestServerMessages(response?.created || []);
+          })
+          .catch((error) => {
+            console.warn("Failed to trigger phone-open message.", error);
+            pushMockNotification();
+          });
+      } else {
+        pushMockNotification();
+      }
       phoneOpenNotifiedRef.current = true;
       return;
     }
@@ -351,7 +627,7 @@ export function GameSceneScreen() {
     if (phoneState === "closed") {
       phoneOpenNotifiedRef.current = false;
     }
-  }, [phoneState, pushMockNotification]);
+  }, [authToken, ingestServerMessages, phoneState, pushMockNotification]);
 
   useEffect(() => {
     if (phoneState !== "closing") {
@@ -389,7 +665,7 @@ export function GameSceneScreen() {
       }
 
       if (phase === "awake") {
-        setPersonaProfile(buildPersonaProfile(readStoredPersonaAnswers() || {}));
+        setPersonaProfile(resolvedPersonaProfile);
         setIsProfileOpen(true);
         return;
       }
@@ -401,11 +677,17 @@ export function GameSceneScreen() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [activeSurfaceId, isProfileOpen, navigate, phase, phoneState]);
+  }, [activeSurfaceId, isProfileOpen, navigate, phase, phoneState, resolvedPersonaProfile]);
 
   const activeWeather =
     WEATHER_OPTIONS.find((option) => option.id === activeWeatherId) ??
     WEATHER_OPTIONS[0];
+  const activeWeatherLabel = useMemo(
+    () => weatherState.sceneLabel || getWeatherDisplayName(activeWeatherId),
+    [activeWeatherId, weatherState.sceneLabel],
+  );
+  const isWeatherSyncing =
+    weatherState.status === "loading" || weatherState.status === "refreshing";
   const activeSurface = useMemo(
     () => DEVICES.find((device) => device.id === activeSurfaceId) ?? null,
     [activeSurfaceId],
@@ -436,8 +718,12 @@ export function GameSceneScreen() {
   };
 
   const handleOpenProfile = () => {
-    setPersonaProfile(buildPersonaProfile(readStoredPersonaAnswers() || {}));
+    setPersonaProfile(resolvedPersonaProfile);
     setIsProfileOpen(true);
+  };
+
+  const handleRefreshWeather = () => {
+    setWeatherRefreshToken((current) => current + 1);
   };
 
   const renderActiveSurface = () => {
@@ -588,11 +874,23 @@ export function GameSceneScreen() {
 
       <header className="game-scene__weather-shell">
         <div className="game-scene__weather-card">
+          <div className="game-scene__weather-head">
+            <span className="game-scene__weather-icon" aria-hidden="true">
+              {/* <OrbIcon kind={activeWeatherId} /> */}
+            </span>
+            <div className="game-scene__weather-text">
           <span className="game-scene__weather-date">
-            2026-05-11 | {activeWeather.label}
+            {weatherState.locationLabel || "实时天气同步中"}
+            {weatherState.updatedAt
+              ? ` | ${formatWeatherTimestamp(weatherState.updatedAt)}`
+              : ""}
           </span>
           <strong className="game-scene__weather-title">窗外</strong>
-          <p className="game-scene__weather-copy">{activeWeather.mood}</p>
+            </div>
+          </div>
+          <p className="game-scene__weather-copy">
+            {weatherState.mood || activeWeather.mood}
+          </p>
         </div>
 
         <div
@@ -652,7 +950,20 @@ export function GameSceneScreen() {
               </span>
             </button>
 
-            {WEATHER_OPTIONS.map((option) => (
+            <button
+              type="button"
+              className={`game-scene__control-orb ${
+                isWeatherSyncing ? "is-active" : ""
+              }`}
+              onClick={handleRefreshWeather}
+              aria-label="刷新实时天气"
+            >
+              <span className="game-scene__orb-icon" aria-hidden="true">
+                <OrbIcon kind="refresh" />
+              </span>
+            </button>
+
+            {[].map((option) => (
               <button
                 key={option.id}
                 type="button"

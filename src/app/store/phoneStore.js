@@ -2,100 +2,17 @@ import { create } from "zustand";
 
 const MAX_NOTIFICATIONS = 24;
 const BANNER_DURATION_MS = 4800;
+const MAX_SERVER_MESSAGE_IDS = 300;
 
-const MOCK_CONVERSATIONS = [
-  {
-    id: "misaki",
-    name: "岬",
-    subtitle: "最近总是很晚才睡",
-    avatarText: "岬",
-    avatarTone: "sunset",
-    unreadCount: 2,
-    messages: [
-      {
-        id: "misaki-1",
-        sender: "them",
-        text: "你今天又把灯开到很晚。",
-        time: "22:11",
-      },
-      {
-        id: "misaki-2",
-        sender: "me",
-        text: "只是想把桌上的东西都看清楚一点。",
-        time: "22:13",
-      },
-      {
-        id: "misaki-3",
-        sender: "them",
-        text: "那你记得睡前把窗户关好，夜里会下雨。",
-        time: "22:14",
-      },
-    ],
-  },
-  {
-    id: "akari",
-    name: "灯里",
-    subtitle: "像在清晨之前发来的消息",
-    avatarText: "灯",
-    avatarTone: "mist",
-    unreadCount: 1,
-    messages: [
-      {
-        id: "akari-1",
-        sender: "them",
-        text: "我把那张歌单又整理了一遍，晚点发你。",
-        time: "21:42",
-      },
-      {
-        id: "akari-2",
-        sender: "them",
-        text: "如果你还醒着，记得听最后一首。",
-        time: "21:43",
-      },
-    ],
-  },
-  {
-    id: "nanase",
-    name: "七濑",
-    subtitle: "总在工作群外说真话",
-    avatarText: "七",
-    avatarTone: "azure",
-    unreadCount: 0,
-    messages: [
-      {
-        id: "nanase-1",
-        sender: "me",
-        text: "今天那份需求又改了吗？",
-        time: "18:08",
-      },
-      {
-        id: "nanase-2",
-        sender: "them",
-        text: "改了，但我猜你已经猜到了。",
-        time: "18:09",
-      },
-    ],
-  },
-];
+const MOCK_CONVERSATIONS = [];
 
 const MOCK_NOTIFICATION_TEMPLATES = [
   {
-    conversationId: "misaki",
+    conversationId: "system-ambient",
+    conversationKey: "system:ambient",
     appId: "messages",
-    title: "岬",
-    body: "我把台灯替你关掉过一次，但你还是会再打开。",
-  },
-  {
-    conversationId: "akari",
-    appId: "messages",
-    title: "灯里",
-    body: "歌单发你了，最后一首别跳过。",
-  },
-  {
-    conversationId: "nanase",
-    appId: "messages",
-    title: "七濑",
-    body: "老板刚才又改了方向，明天应该会很长。",
+    title: "Earth Online",
+    body: "The world is still loading a softer voice for you.",
   },
 ];
 
@@ -107,17 +24,34 @@ function formatTime(date = new Date()) {
   ).padStart(2, "0")}`;
 }
 
-function buildNotification(template, timeLabel) {
+function formatServerTime(value) {
+  if (!value) {
+    return formatTime();
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return formatTime();
+  }
+
+  return formatTime(date);
+}
+
+function buildNotification(template, timeLabel, id) {
   return {
-    id: `${template.appId}-${Date.now()}-${Math.random()
-      .toString(36)
-      .slice(2, 8)}`,
+    id:
+      id ||
+      `${template.appId}-${Date.now()}-${Math.random()
+        .toString(36)
+        .slice(2, 8)}`,
     appId: template.appId,
     title: template.title,
     body: template.body,
     time: timeLabel,
     conversationId: template.conversationId,
+    conversationKey: template.conversationKey || template.conversationId || null,
     createdAt: Date.now(),
+    serverMessageId: template.serverMessageId || null,
   };
 }
 
@@ -129,6 +63,7 @@ function appendIncomingMessage(conversation, template, timeLabel) {
   return {
     ...conversation,
     unreadCount: conversation.unreadCount + 1,
+    subtitle: template.body,
     messages: [
       ...conversation.messages,
       {
@@ -141,6 +76,142 @@ function appendIncomingMessage(conversation, template, timeLabel) {
   };
 }
 
+function safeConversationId(message) {
+  return (
+    message.conversation_key ||
+    message.sender_name ||
+    message.title ||
+    "system"
+  )
+    .toString()
+    .trim()
+    .replace(/\s+/g, "-")
+    .slice(0, 80);
+}
+
+function toneFromId(id) {
+  const tones = ["sunset", "mist", "azure"];
+  const charCodeSum = Array.from(id).reduce(
+    (sum, char) => sum + char.charCodeAt(0),
+    0,
+  );
+  return tones[charCodeSum % tones.length];
+}
+
+function isPlayerMessage(message) {
+  return message?.payload?.kind === "player_message";
+}
+
+function resolveConversationName(message, fallback = "System") {
+  if (isPlayerMessage(message)) {
+    return (
+      message?.payload?.partner_name ||
+      message?.title ||
+      message?.conversation_key ||
+      fallback
+    );
+  }
+
+  return message?.sender_name || message?.title || fallback;
+}
+
+function createConversationFromServerMessage(message, conversationId) {
+  const name = resolveConversationName(message, "System");
+
+  return {
+    id: conversationId,
+    name,
+    subtitle: message.content || "",
+    avatarText: name.slice(0, 1),
+    avatarTone: toneFromId(conversationId),
+    conversationKey: message.conversation_key || conversationId,
+    unreadCount: 0,
+    messages: [],
+  };
+}
+
+function upsertServerChatMessage(conversations, message) {
+  const conversationId = safeConversationId(message);
+  const timeLabel = formatServerTime(message.delivered_at || message.created_at);
+  const messageId = `server-${message.id}`;
+  const playerMessage = isPlayerMessage(message);
+  const clientMessageId = message?.payload?.client_message_id || null;
+  let found = false;
+
+  const nextConversations = conversations.map((conversation) => {
+    if (conversation.id !== conversationId) {
+      return conversation;
+    }
+
+    found = true;
+
+    if (conversation.messages.some((item) => item.id === messageId)) {
+      return conversation;
+    }
+
+    const nextMessages = [...conversation.messages];
+    const optimisticIndex =
+      playerMessage && clientMessageId
+        ? nextMessages.findIndex(
+            (item) => item.id === clientMessageId && item.sender === "me",
+          )
+        : -1;
+
+    if (optimisticIndex >= 0) {
+      nextMessages[optimisticIndex] = {
+        ...nextMessages[optimisticIndex],
+        id: messageId,
+        text: message.content,
+        time: timeLabel,
+      };
+    } else {
+      nextMessages.push({
+        id: messageId,
+        sender: playerMessage ? "me" : "them",
+        text: message.content,
+        time: timeLabel,
+      });
+    }
+
+    return {
+      ...conversation,
+      name: resolveConversationName(message, conversation.name),
+      subtitle: message.content,
+      conversationKey:
+        message.conversation_key || conversation.conversationKey || conversationId,
+      unreadCount: playerMessage
+        ? conversation.unreadCount
+        : conversation.unreadCount + 1,
+      messages: nextMessages,
+    };
+  });
+
+  if (found) {
+    return nextConversations;
+  }
+
+  const nextConversation = createConversationFromServerMessage(
+    message,
+    conversationId,
+  );
+
+  return [
+    {
+      ...nextConversation,
+      unreadCount: playerMessage ? 0 : 1,
+      messages: [
+        {
+          id: messageId,
+          sender: playerMessage ? "me" : "them",
+          text: message.content,
+          time: timeLabel,
+        },
+      ],
+    },
+    ...nextConversations,
+  ];
+}
+
 function dismissActiveBanner(set) {
   if (typeof window !== "undefined" && bannerTimerId) {
     window.clearTimeout(bannerTimerId);
@@ -150,12 +221,27 @@ function dismissActiveBanner(set) {
   set({ activeNotification: null });
 }
 
+function scheduleBannerDismiss(set) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  if (bannerTimerId) {
+    window.clearTimeout(bannerTimerId);
+  }
+
+  bannerTimerId = window.setTimeout(() => {
+    dismissActiveBanner(set);
+  }, BANNER_DURATION_MS);
+}
+
 export const usePhoneStore = create((set, get) => ({
   theme: "day",
   notifications: [],
   activeNotification: null,
   notificationCursor: 0,
   conversations: MOCK_CONVERSATIONS,
+  serverMessageIds: [],
   setTheme: (theme) => set({ theme }),
   toggleTheme: () =>
     set((state) => ({
@@ -176,15 +262,7 @@ export const usePhoneStore = create((set, get) => ({
       ),
     }));
 
-    if (typeof window !== "undefined") {
-      if (bannerTimerId) {
-        window.clearTimeout(bannerTimerId);
-      }
-
-      bannerTimerId = window.setTimeout(() => {
-        dismissActiveBanner(set);
-      }, BANNER_DURATION_MS);
-    }
+    scheduleBannerDismiss(set);
   },
   pushMockNotification: () => {
     const { notificationCursor } = get();
@@ -195,6 +273,71 @@ export const usePhoneStore = create((set, get) => ({
 
     get().pushNotification(template);
     set({ notificationCursor: notificationCursor + 1 });
+  },
+  ingestServerMessages: (messages = []) => {
+    if (!Array.isArray(messages) || messages.length === 0) {
+      return;
+    }
+
+    const knownIds = get().serverMessageIds;
+    const freshMessages = messages.filter(
+      (message) => message?.id && !knownIds.includes(message.id),
+    );
+
+    if (freshMessages.length === 0) {
+      return;
+    }
+
+    let latestNotification = null;
+
+    set((state) => {
+      let nextConversations = state.conversations;
+      let nextNotifications = state.notifications;
+
+      freshMessages.forEach((message) => {
+        if (message.channel === "chat") {
+          nextConversations = upsertServerChatMessage(nextConversations, message);
+          return;
+        }
+
+        if (message.channel === "notification") {
+          const conversationId = safeConversationId(message);
+          const timeLabel = formatServerTime(
+            message.delivered_at || message.created_at,
+          );
+          latestNotification = buildNotification(
+            {
+              appId: "messages",
+              conversationId,
+              conversationKey: message.conversation_key || conversationId,
+              title: message.title || message.sender_name || "New message",
+              body: message.content,
+              serverMessageId: message.id,
+            },
+            timeLabel,
+            `server-notification-${message.id}`,
+          );
+          nextNotifications = [latestNotification, ...nextNotifications].slice(
+            0,
+            MAX_NOTIFICATIONS,
+          );
+        }
+      });
+
+      return {
+        conversations: nextConversations,
+        notifications: nextNotifications,
+        activeNotification: latestNotification || state.activeNotification,
+        serverMessageIds: [
+          ...state.serverMessageIds,
+          ...freshMessages.map((message) => message.id),
+        ].slice(-MAX_SERVER_MESSAGE_IDS),
+      };
+    });
+
+    if (latestNotification) {
+      scheduleBannerDismiss(set);
+    }
   },
   dismissNotificationBanner: () => {
     dismissActiveBanner(set);
@@ -222,28 +365,29 @@ export const usePhoneStore = create((set, get) => ({
   sendMessage: (conversationId, text) => {
     const normalizedText = text.trim();
     if (!normalizedText) {
-      return;
+      return null;
     }
 
     const timeLabel = formatTime();
+    const outgoingMessage = {
+      id: `${conversationId}-me-${Date.now()}`,
+      sender: "me",
+      text: normalizedText,
+      time: timeLabel,
+    };
 
     set((state) => ({
       conversations: state.conversations.map((conversation) =>
         conversation.id === conversationId
           ? {
               ...conversation,
-              messages: [
-                ...conversation.messages,
-                {
-                  id: `${conversation.id}-me-${Date.now()}`,
-                  sender: "me",
-                  text: normalizedText,
-                  time: timeLabel,
-                },
-              ],
+              subtitle: normalizedText,
+              messages: [...conversation.messages, outgoingMessage],
             }
           : conversation,
       ),
     }));
+
+    return outgoingMessage;
   },
 }));

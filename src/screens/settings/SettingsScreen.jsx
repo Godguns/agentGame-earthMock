@@ -1,7 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
+import { hasBoundPersona, useAuthStore } from "../../app/store/authStore";
+import {
+  getCitiesForProvince,
+  getLocationSelection,
+  LOCATION_PROVINCES,
+} from "../../data/locationCatalog";
+import { buildPersonaProfile } from "../game/personaProfile";
 import {
   PERSONA_CALIBRATION_SECTIONS,
   SETTINGS_SECTIONS,
@@ -39,6 +46,13 @@ function buildDefaultAnswer(question) {
     return DEFAULT_BIRTH_DATE;
   }
 
+  if (question.type === "location") {
+    return {
+      provinceId: "",
+      cityId: "",
+    };
+  }
+
   if (question.type === "multi-choice") {
     return [];
   }
@@ -70,6 +84,21 @@ function normalizeAnswer(question, value) {
     }
 
     return DEFAULT_BIRTH_DATE;
+  }
+
+  if (question.type === "location") {
+    if (value && typeof value === "object") {
+      return {
+        provinceId:
+          typeof value.provinceId === "string" ? value.provinceId : "",
+        cityId: typeof value.cityId === "string" ? value.cityId : "",
+      };
+    }
+
+    return {
+      provinceId: "",
+      cityId: "",
+    };
   }
 
   if (question.type === "multi-choice") {
@@ -139,6 +168,10 @@ function clamp(value, min, max) {
 function isAnswerComplete(question, value) {
   if (question.type === "date") {
     return Boolean(value?.year && value?.month && value?.day);
+  }
+
+  if (question.type === "location") {
+    return Boolean(getLocationSelection(value));
   }
 
   if (question.type === "multi-choice") {
@@ -586,7 +619,97 @@ function TextQuestion({ question, value, onChange }) {
   );
 }
 
-function PersonaCalibrationPanel({ answers, onAnswerChange }) {
+function LocationQuestion({ question, value, onChange }) {
+  const cities = useMemo(
+    () => getCitiesForProvince(value?.provinceId),
+    [value?.provinceId],
+  );
+  const currentSelection = getLocationSelection(value);
+
+  return (
+    <div className="persona-question">
+      <p className="persona-question__title">{question.prompt}</p>
+      {question.hint ? <p className="persona-question__hint">{question.hint}</p> : null}
+
+      <div className="location-anchor">
+        <div className="location-anchor__frame" />
+        <div className="location-anchor__statusbar">
+          <span>CITY ANCHOR</span>
+          <span>WEATHER.SYNC</span>
+          <span>{currentSelection ? "LOCKED" : "PENDING"}</span>
+        </div>
+
+        <div className="location-anchor__grid">
+          <label className="location-anchor__field">
+            <span className="location-anchor__label">省份 Province</span>
+            <select
+              className="location-anchor__select"
+              value={value?.provinceId || ""}
+              onChange={(event) => {
+                onChange({
+                  provinceId: event.target.value,
+                  cityId: "",
+                });
+              }}
+            >
+              <option value="">请选择省份</option>
+              {LOCATION_PROVINCES.map((province) => (
+                <option key={province.id} value={province.id}>
+                  {province.label}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="location-anchor__field">
+            <span className="location-anchor__label">城市 City</span>
+            <select
+              className="location-anchor__select"
+              value={value?.cityId || ""}
+              disabled={!value?.provinceId}
+              onChange={(event) => {
+                onChange({
+                  provinceId: value?.provinceId || "",
+                  cityId: event.target.value,
+                });
+              }}
+            >
+              <option value="">请选择城市</option>
+              {cities.map((city) => (
+                <option key={city.id} value={city.id}>
+                  {city.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        <div className="location-anchor__readout">
+          <span className="location-anchor__caption">实时天气坐标</span>
+          <div className="location-anchor__readout-group">
+            <strong>
+              {currentSelection ? currentSelection.label : "城市未标定"}
+            </strong>
+            <span>
+              {currentSelection
+                ? "游戏会按这个城市同步窗外天气"
+                : "完成选择后，窗外场景会自动切换"}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PersonaCalibrationPanel({
+  answers,
+  onAnswerChange,
+  isCalibrationComplete,
+  onComplete,
+  completeLabel,
+  completeDisabled,
+}) {
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
   const answeredCount = useMemo(
     () =>
@@ -740,6 +863,14 @@ function PersonaCalibrationPanel({ answers, onAnswerChange }) {
               />
             ) : null}
 
+            {activeEntry.type === "location" ? (
+              <LocationQuestion
+                question={activeEntry}
+                value={answers[activeEntry.id]}
+                onChange={(nextValue) => onAnswerChange(activeEntry.id, nextValue)}
+              />
+            ) : null}
+
             {activeEntry.type === "single-choice" || activeEntry.type === "multi-choice" ? (
               <ChoiceQuestion
                 question={activeEntry}
@@ -794,6 +925,21 @@ function PersonaCalibrationPanel({ answers, onAnswerChange }) {
               {isLastQuestion ? "Calibration Complete" : "Next Question"}
             </button>
           </div>
+
+          {onComplete ? (
+            <div className="persona-flow__footer-group persona-flow__footer-group--complete">
+              <button
+                className="persona-flow__primary persona-flow__primary--complete"
+                type="button"
+                disabled={!isCalibrationComplete || completeDisabled}
+                onClick={onComplete}
+              >
+                {completeDisabled
+                  ? "Saving..."
+                  : completeLabel || "Save calibration"}
+              </button>
+            </div>
+          ) : null}
         </footer>
       </div>
     </div>
@@ -815,28 +961,64 @@ function PlaceholderPanel({ label, description }) {
 }
 
 export function SettingsScreen() {
+  const location = useLocation();
   const navigate = useNavigate();
+  const token = useAuthStore((state) => state.token);
+  const persona = useAuthStore((state) => state.persona);
+  const syncPersona = useAuthStore((state) => state.syncPersona);
+  const personaSyncStatus = useAuthStore((state) => state.personaSyncStatus);
+  const personaSyncError = useAuthStore((state) => state.personaSyncError);
   const [activeSection, setActiveSection] = useState("persona");
   const [answers, setAnswers] = useState(buildInitialAnswers);
   const [isExitingToMenu, setIsExitingToMenu] = useState(false);
+  const [isCompletingFlow, setIsCompletingFlow] = useState(false);
+  const isOnboarding = location.state?.purpose === "onboarding";
+  const redirectTo = location.state?.redirectTo || "/menu";
+  const isCalibrationComplete = useMemo(
+    () =>
+      FLAT_PERSONA_QUESTIONS.every((question) =>
+        isAnswerComplete(question, answers[question.id]),
+      ),
+    [answers],
+  );
 
   useEffect(() => {
     try {
-      const storedValue = window.localStorage.getItem(SETTINGS_STORAGE_KEY);
-      if (!storedValue) {
-        return;
-      }
+      const localDraft = window.localStorage.getItem(SETTINGS_STORAGE_KEY);
+      const localAnswers = localDraft ? JSON.parse(localDraft) : null;
+      const remoteAnswers = persona?.raw_settings?.rawAnswers || null;
+      const shouldPreferRemote = hasBoundPersona(persona);
+      const restoredAnswers = shouldPreferRemote
+        ? remoteAnswers || localAnswers
+        : localAnswers || remoteAnswers;
 
-      const parsed = JSON.parse(storedValue);
-      setAnswers(normalizeStoredAnswers(parsed));
+      if (restoredAnswers) {
+        setAnswers(normalizeStoredAnswers(restoredAnswers));
+      }
     } catch (error) {
       console.warn("Failed to restore settings draft.", error);
     }
-  }, []);
+  }, [persona]);
 
   useEffect(() => {
     window.localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(answers));
   }, [answers]);
+
+  useEffect(() => {
+    if (!token || !isCalibrationComplete) {
+      return undefined;
+    }
+
+    const timerId = window.setTimeout(() => {
+      syncPersona(buildPersonaProfile(answers)).catch((error) => {
+        console.warn("Failed to sync persona profile.", error);
+      });
+    }, 10000);
+
+    return () => {
+      window.clearTimeout(timerId);
+    };
+  }, [answers, isCalibrationComplete, syncPersona, token]);
 
   const currentSection = SETTINGS_SECTIONS.find(
     (section) => section.id === activeSection,
@@ -860,6 +1042,31 @@ export function SettingsScreen() {
     }, 620);
   };
 
+  const handleCompleteFlow = async () => {
+    if (!isCalibrationComplete || isCompletingFlow) {
+      return;
+    }
+
+    const profile = buildPersonaProfile(answers);
+
+    setIsCompletingFlow(true);
+    try {
+      if (token) {
+        await syncPersona(profile);
+      }
+
+      navigate(redirectTo, {
+        state: {
+          from: "settings",
+          personaBound: true,
+        },
+      });
+    } catch (error) {
+      console.warn("Failed to complete persona calibration flow.", error);
+      setIsCompletingFlow(false);
+    }
+  };
+
   return (
     <main
       className={`settings-screen ${isExitingToMenu ? "is-exiting-to-menu" : ""}`}
@@ -879,6 +1086,22 @@ export function SettingsScreen() {
           <div className="settings-sidebar__title-wrap">
             <p className="settings-sidebar__eyebrow">SYSTEM SETTINGS</p>
             <h1 className="settings-sidebar__title">游戏设置</h1>
+          </div>
+
+          <div
+            className={`settings-sidebar__sync settings-sidebar__sync--${personaSyncStatus}`}
+          >
+            <span>Cloud Persona</span>
+            <strong>
+              {!token
+                ? "Local only"
+                : personaSyncStatus === "syncing"
+                  ? "Syncing"
+                  : personaSyncStatus === "error"
+                    ? "Sync failed"
+                    : "Synced"}
+            </strong>
+            {personaSyncError ? <em>{personaSyncError}</em> : null}
           </div>
 
           <nav className="settings-nav" aria-label="设置分类">
@@ -907,6 +1130,12 @@ export function SettingsScreen() {
             <PersonaCalibrationPanel
               answers={answers}
               onAnswerChange={handleAnswerChange}
+              isCalibrationComplete={isCalibrationComplete}
+              onComplete={handleCompleteFlow}
+              completeLabel={
+                isOnboarding ? "Save and enter game" : "Save calibration"
+              }
+              completeDisabled={isCompletingFlow}
             />
           ) : (
             <PlaceholderPanel

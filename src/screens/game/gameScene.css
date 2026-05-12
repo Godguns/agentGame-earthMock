@@ -495,6 +495,7 @@
   box-shadow:
     0 10px 30px rgba(0, 0, 0, 0.16),
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    transform: scale(.8);
 }
 
 .game-scene__weather-date {
@@ -6008,4 +6009,84 @@
     bottom: 96px;
     min-width: 0;
   }
+}
+
+/* Final message layout guardrails */
+.virtual-phone__content,
+.virtual-phone__app-screen,
+.virtual-phone__messages-screen {
+  min-height: 0 !important;
+}
+
+.virtual-phone__messages-screen {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  overflow: hidden !important;
+}
+
+.virtual-phone__app-topbar {
+  flex: 0 0 auto !important;
+  position: relative;
+  z-index: 1;
+  min-height: 0 !important;
+  padding: 6px 18px 4px !important;
+  margin-bottom: 6px !important;
+}
+
+.virtual-phone__back-action {
+  position: relative;
+  z-index: 2;
+  pointer-events: auto !important;
+}
+
+.virtual-phone__chat-heading {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  pointer-events: none;
+}
+
+.virtual-phone__chat-heading .virtual-phone__app-topbar-title,
+.virtual-phone__chat-heading small {
+  display: block !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.virtual-phone__topbar-spacer {
+  pointer-events: none;
+}
+
+.virtual-phone__messages-list {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+}
+
+.virtual-phone__messages-thread {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  height: auto !important;
+  overflow-y: auto !important;
+}
+
+.virtual-phone__messages-composer {
+  position: static !important;
+  flex: 0 0 auto !important;
+  margin-top: 0 !important;
+}
+
+.virtual-phone__messages-avatar {
+  display: grid !important;
+  place-items: center !important;
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px !important;
+  min-height: 42px !important;
+  border-radius: 50% !important;
+  aspect-ratio: 1 / 1;
+  overflow: hidden !important;
+  flex: 0 0 42px !important;
 }

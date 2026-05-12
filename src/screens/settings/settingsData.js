@@ -424,6 +424,12 @@ export const PERSONA_CALIBRATION_SECTIONS = [
         ],
       },
       {
+        id: "currentCity",
+        type: "location",
+        prompt: "31. 你现在所在的城市？",
+        hint: "先选所在省份，再选当前城市。游戏会用它同步真实天气。",
+      },
+      {
         id: "playerName",
         type: "text",
         prompt: "31. 你的名字？",

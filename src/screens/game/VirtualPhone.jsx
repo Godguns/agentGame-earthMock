@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { useAuthStore } from "../../app/store/authStore";
 import {
   DEFAULT_PC_WALLPAPER,
   useCustomizationStore,
 } from "../../app/store/customizationStore";
 import { usePhoneStore } from "../../app/store/phoneStore";
+import { sendPlayerReply } from "../../services/earthMockApi";
 import { GAME_SCENE_ASSETS } from "./gameSceneAssets";
 
 const PHONE_AUDIO_SETTINGS = {
@@ -406,7 +408,7 @@ function PhoneMessagesApp({
       return;
     }
 
-    onSendMessage(activeConversation.id, draft);
+    onSendMessage(activeConversation, draft);
     setDraft("");
   };
 
@@ -476,7 +478,6 @@ function PhoneMessagesApp({
           <span className="virtual-phone__app-topbar-title">
             {activeConversation.name}
           </span>
-          <small>{activeConversation.subtitle}</small>
         </div>
         <span className="virtual-phone__topbar-spacer" aria-hidden="true" />
       </div>
@@ -727,6 +728,7 @@ export function VirtualPhone({ state, onClose }) {
   const removeNotification = usePhoneStore(
     (stateValue) => stateValue.removeNotification,
   );
+  const authToken = useAuthStore((stateValue) => stateValue.token);
 
   const phoneWallpaper = useCustomizationStore(
     (stateValue) => stateValue.phoneWallpaper,
@@ -748,6 +750,33 @@ export function VirtualPhone({ state, onClose }) {
       playPhoneUiSound("close");
     }
   }, [state]);
+
+  const handleSendMessage = async (conversation, text) => {
+    const outgoing = sendMessage(conversation.id, text);
+    if (!outgoing || !authToken) {
+      return;
+    }
+
+    try {
+      const response = await sendPlayerReply(
+        {
+          content: text.trim(),
+          conversation_key:
+            conversation.conversationKey || conversation.id || "system:chat",
+          sender_name: conversation.name || "Earth Online",
+          title: `${conversation.name || "Earth Online"} received your message`,
+          client_message_id: outgoing.id,
+        },
+        authToken,
+      );
+
+      if (response?.created?.length) {
+        usePhoneStore.getState().ingestServerMessages(response.created);
+      }
+    } catch (error) {
+      console.warn("Failed to send player reply acknowledgement.", error);
+    }
+  };
 
   useEffect(() => {
     if (state === "closed") {
@@ -980,7 +1009,7 @@ export function VirtualPhone({ state, onClose }) {
                   onSelectConversation={handleOpenConversation}
                   onBack={() => setCurrentAppId(null)}
                   onBackToList={() => setActiveConversationId(null)}
-                  onSendMessage={sendMessage}
+                  onSendMessage={handleSendMessage}
                 />
               ) : currentAppId === "settings" ? (
                 <SettingsApp

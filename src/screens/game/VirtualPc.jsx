@@ -1,9 +1,11 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import {
   DEFAULT_PC_WALLPAPER,
   useCustomizationStore,
 } from "../../app/store/customizationStore";
+import { runTerminalCommand } from "./terminalCommands";
 
 function DesktopIconGlyph({ kind }) {
   const commonProps = {
@@ -315,7 +317,7 @@ function QuickPanel({ kind }) {
   );
 }
 
-function TerminalWindow({ onClose, onOpenApp, onOpenQuickPanel }) {
+function TerminalWindow({ onClose, onOpenApp, onOpenQuickPanel, onUserControl }) {
   const [history, setHistory] = useState([
     { type: "output", text: "earth.online shell ready" },
     { type: "output", text: "type 'help' to list available commands" },
@@ -324,55 +326,22 @@ function TerminalWindow({ onClose, onOpenApp, onOpenQuickPanel }) {
 
   const runCommand = (raw) => {
     const nextHistory = [...history, { type: "input", text: raw }];
-    const parts = raw.split(" ");
-    const base = parts[0].toLowerCase();
-    const arg = parts.slice(1).join(" ").trim().toLowerCase();
+    const outputLines = runTerminalCommand(raw, {
+      onClear: () => setHistory([]),
+      onOpenApp: (appId) => window.setTimeout(() => onOpenApp(appId), 120),
+      onOpenQuickPanel: (panelId) =>
+        window.setTimeout(() => onOpenQuickPanel(panelId), 120),
+      onUserControl: () => window.setTimeout(() => onUserControl(), 120),
+    });
 
-    if (base === "clear") {
-      setHistory([]);
+    if (outputLines.length === 0) {
       return;
     }
 
-    if (base === "help") {
-      setHistory([
-        ...nextHistory,
-        { type: "output", text: "available: help, clear, status, echo <text>" },
-        { type: "output", text: "open <messages|jobs|notes|files|browser|network|battery>" },
-      ]);
-      return;
-    }
-
-    if (base === "status") {
-      setHistory([
-        ...nextHistory,
-        { type: "output", text: "scene: bedroom / desk: online / shell: ready" },
-      ]);
-      return;
-    }
-
-    if (base === "echo") {
-      setHistory([
-        ...nextHistory,
-        { type: "output", text: parts.slice(1).join(" ") || "(empty)" },
-      ]);
-      return;
-    }
-
-    if (base === "open" && arg) {
-      if (["messages", "jobs", "notes", "files", "browser"].includes(arg)) {
-        setHistory([...nextHistory, { type: "output", text: `opening ${arg}...` }]);
-        window.setTimeout(() => onOpenApp(arg), 120);
-        return;
-      }
-
-      if (["network", "battery"].includes(arg)) {
-        setHistory([...nextHistory, { type: "output", text: `opening ${arg} panel...` }]);
-        window.setTimeout(() => onOpenQuickPanel(arg), 120);
-        return;
-      }
-    }
-
-    setHistory([...nextHistory, { type: "output", text: `'${raw}' is not recognized.` }]);
+    setHistory([
+      ...nextHistory,
+      ...outputLines.map((text) => ({ type: "output", text })),
+    ]);
   };
 
   const handleSubmit = (event) => {
@@ -599,6 +568,7 @@ function GenericWindow({ appId, onClose }) {
 }
 
 export function VirtualPc({ onClose }) {
+  const navigate = useNavigate();
   const [isStartOpen, setIsStartOpen] = useState(false);
   const [activeWindowId, setActiveWindowId] = useState(null);
   const [quickPanel, setQuickPanel] = useState(null);
@@ -695,6 +665,11 @@ export function VirtualPc({ onClose }) {
               onClose={() => setActiveWindowId(null)}
               onOpenApp={openWindow}
               onOpenQuickPanel={toggleQuickPanel}
+              onUserControl={() => {
+                setActiveWindowId(null);
+                onClose();
+                navigate("/internal/users");
+              }}
             />
           ) : activeWindowId === "messages" ? (
             <MessagesWindow onClose={() => setActiveWindowId(null)} />

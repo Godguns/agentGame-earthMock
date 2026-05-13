@@ -4738,6 +4738,74 @@
   border: 1px solid var(--phone-card-border);
 }
 
+.virtual-phone__terminal-screen {
+  gap: 14px;
+}
+
+.virtual-phone__terminal-panel {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--phone-card-border);
+  border-radius: 24px;
+  background: var(--phone-card-bg);
+  box-shadow: var(--phone-panel-shadow);
+}
+
+.virtual-phone__terminal-body {
+  min-height: 0;
+  overflow: auto;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding-right: 4px;
+  font-family: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+}
+
+.virtual-phone__terminal-line {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  color: var(--phone-text-strong);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.virtual-phone__terminal-prefix {
+  color: var(--phone-text-muted);
+}
+
+.virtual-phone__terminal-line.is-command {
+  color: var(--phone-text-strong);
+}
+
+.virtual-phone__terminal-form {
+  border-top: 1px solid var(--phone-card-border);
+  padding-top: 12px;
+}
+
+.virtual-phone__terminal-input {
+  width: 100%;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+.virtual-phone__terminal-input:focus {
+  outline: none;
+}
+
+.virtual-phone__terminal-input::placeholder {
+  color: var(--phone-text-muted);
+}
+
 .virtual-phone__notification-empty strong {
   display: block;
   margin-bottom: 6px;

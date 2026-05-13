@@ -109,6 +109,13 @@ export function fetchPersona(token) {
   });
 }
 
+export function fetchInternalUsers(token) {
+  return request("/internal/users", {
+    method: "GET",
+    token,
+  });
+}
+
 export function sendPlayerReply(payload, token) {
   return request("/messages/reply", {
     method: "POST",

@@ -8,6 +8,10 @@ function getVariant(pathname) {
     return "settings";
   }
 
+  if (pathname.startsWith("/internal")) {
+    return "settings";
+  }
+
   return "menu";
 }
 

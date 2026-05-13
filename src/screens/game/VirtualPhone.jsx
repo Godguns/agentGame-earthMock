@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { useAuthStore } from "../../app/store/authStore";
 import {
@@ -8,6 +9,7 @@ import {
 import { usePhoneStore } from "../../app/store/phoneStore";
 import { sendPlayerReply } from "../../services/earthMockApi";
 import { GAME_SCENE_ASSETS } from "./gameSceneAssets";
+import { runTerminalCommand } from "./terminalCommands";
 
 const PHONE_AUDIO_SETTINGS = {
   enabled: true,
@@ -156,6 +158,29 @@ function PhoneVectorIcon({ kind }) {
           stroke="currentColor"
           strokeWidth="1.5"
           strokeLinecap="round"
+        />
+      </svg>
+    );
+  }
+
+  if (kind === "terminal") {
+    return (
+      <svg {...commonProps}>
+        <rect
+          x="4.2"
+          y="5.1"
+          width="15.6"
+          height="13.8"
+          rx="3"
+          stroke="currentColor"
+          strokeWidth="1.5"
+        />
+        <path
+          d="M8.4 10.1L10.9 12L8.4 13.9M12.4 14H15.8"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
       </svg>
     );
@@ -351,6 +376,16 @@ function PhoneAppIcon({ app, onOpen, isPressing }) {
 }
 
 function PhoneHome({ onOpenApp, pressingAppId }) {
+  const homeApps = useMemo(
+    () => [
+      ...PHONE_APPS,
+      { id: "terminal", label: "终端", subtitle: "隐藏菜单入口", iconType: "vector" },
+    ].filter(
+      (app, index, apps) => apps.findIndex((item) => item.id === app.id) === index,
+    ),
+    [],
+  );
+
   return (
     <section className="virtual-phone__home">
       <header className="virtual-phone__hero">
@@ -364,7 +399,7 @@ function PhoneHome({ onOpenApp, pressingAppId }) {
       </header>
 
       <div className="virtual-phone__app-grid">
-        {PHONE_APPS.map((app) => (
+        {homeApps.map((app) => (
           <PhoneAppIcon
             key={app.id}
             app={app}
@@ -665,6 +700,86 @@ function SettingsApp({
   );
 }
 
+function TerminalApp({ onBack, onUserControl, onOpenApp }) {
+  const [history, setHistory] = useState([
+    { type: "output", text: "earth.online shell ready" },
+    { type: "output", text: "type 'help' to list available commands" },
+  ]);
+  const [command, setCommand] = useState("");
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const raw = command.trim();
+    if (!raw) {
+      return;
+    }
+
+    const nextHistory = [...history, { type: "input", text: raw }];
+    const outputLines = runTerminalCommand(raw, {
+      onClear: () => setHistory([]),
+      onOpenApp: (appId) => window.setTimeout(() => onOpenApp(appId), 120),
+      onUserControl: () => window.setTimeout(() => onUserControl(), 120),
+    });
+
+    if (outputLines.length > 0) {
+      setHistory([
+        ...nextHistory,
+        ...outputLines.map((text) => ({ type: "output", text })),
+      ]);
+    }
+
+    setCommand("");
+  };
+
+  return (
+    <section className="virtual-phone__app-screen virtual-phone__terminal-screen">
+      <div className="virtual-phone__app-topbar">
+        <button
+          type="button"
+          className="virtual-phone__back-action"
+          onClick={onBack}
+        >
+          返回
+        </button>
+        <span className="virtual-phone__app-topbar-title">终端</span>
+        <span className="virtual-phone__topbar-spacer" aria-hidden="true" />
+      </div>
+
+      <div className="virtual-phone__terminal-panel">
+        <div className="virtual-phone__terminal-body">
+          {history.map((entry, index) => (
+            <p
+              key={`${entry.type}-${entry.text}-${index}`}
+              className={`virtual-phone__terminal-line ${
+                entry.type === "input" ? "is-command" : ""
+              }`}
+            >
+              <span className="virtual-phone__terminal-prefix">
+                {entry.type === "input" ? "mobile>" : "system:"}
+              </span>
+              {entry.text}
+            </p>
+          ))}
+        </div>
+
+        <form className="virtual-phone__terminal-form" onSubmit={handleSubmit}>
+          <label className="virtual-phone__terminal-line is-input">
+            <span className="virtual-phone__terminal-prefix">mobile&gt;</span>
+            <input
+              className="virtual-phone__terminal-input"
+              value={command}
+              onChange={(event) => setCommand(event.target.value)}
+              autoFocus
+              spellCheck="false"
+              placeholder="输入 help 或 userControl"
+            />
+          </label>
+        </form>
+      </div>
+    </section>
+  );
+}
+
 function PlaceholderApp({ appId, onBack }) {
   const currentApp = PHONE_APPS.find((app) => app.id === appId);
   const iconAsset = appIconFor(appId);
@@ -703,6 +818,7 @@ function PlaceholderApp({ appId, onBack }) {
 }
 
 export function VirtualPhone({ state, onClose }) {
+  const navigate = useNavigate();
   const [currentAppId, setCurrentAppId] = useState(null);
   const [pressingAppId, setPressingAppId] = useState(null);
   const [closeDragOffset, setCloseDragOffset] = useState(0);
@@ -1022,6 +1138,21 @@ export function VirtualPhone({ state, onClose }) {
                   onSelectPcWallpaper={setPcWallpaper}
                   onClearPhoneWallpaper={() => setPhoneWallpaper("")}
                   onClearPcWallpaper={() => setPcWallpaper("")}
+                />
+              ) : currentAppId === "terminal" ? (
+                <TerminalApp
+                  onBack={() => setCurrentAppId(null)}
+                  onOpenApp={(appId) => {
+                    setCurrentAppId(appId);
+                    if (appId === "messages") {
+                      setActiveConversationId(null);
+                    }
+                  }}
+                  onUserControl={() => {
+                    setCurrentAppId(null);
+                    onClose();
+                    navigate("/internal/users");
+                  }}
                 />
               ) : (
                 <PlaceholderApp

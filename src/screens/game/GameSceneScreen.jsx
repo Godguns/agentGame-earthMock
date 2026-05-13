@@ -27,6 +27,16 @@ import "./gameScene.css";
 const MOCK_NOTIFICATION_INTERVAL_MS = 3 * 60 * 1000;
 const WEATHER_REFRESH_INTERVAL_MS = 20 * 60 * 1000;
 
+function shouldDirectOpenPhoneOnMobile() {
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+    return false;
+  }
+
+  const compactScreen = window.matchMedia("(max-width: 900px)").matches;
+  const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
+  return compactScreen || coarsePointer;
+}
+
 const WEATHER_OPTIONS = [
   {
     id: "cloudy",
@@ -350,6 +360,8 @@ export function GameSceneScreen() {
   const notificationLoopStartedRef = useRef(false);
   const sceneEntryNotificationSentRef = useRef(false);
   const phoneOpenNotifiedRef = useRef(false);
+  const mobileDirectOpenRef = useRef(false);
+  const mobileDirectOpenDoneRef = useRef(false);
   const messageCursorRef = useRef(null);
   const personaSyncedRef = useRef(false);
   const [phase, setPhase] = useState("closed");
@@ -364,6 +376,7 @@ export function GameSceneScreen() {
   const [personaProfile, setPersonaProfile] = useState(() =>
     buildPersonaProfile(readStoredPersonaAnswers() || {}),
   );
+  const isPhoneVisible = phoneState !== "closed";
   const pcWallpaper = useCustomizationStore((state) => state.pcWallpaper);
   const resolvedPcWallpaper = pcWallpaper || DEFAULT_PC_WALLPAPER;
   const authToken = useAuthStore((state) => state.token);
@@ -607,7 +620,30 @@ export function GameSceneScreen() {
   }, [authToken, ingestServerMessages, phase, pushMockNotification]);
 
   useEffect(() => {
+    if (
+      phase !== "awake" ||
+      isPhoneVisible ||
+      activeSurfaceId ||
+      isProfileOpen ||
+      mobileDirectOpenDoneRef.current ||
+      !shouldDirectOpenPhoneOnMobile()
+    ) {
+      return;
+    }
+
+    mobileDirectOpenDoneRef.current = true;
+    mobileDirectOpenRef.current = true;
+    setPhoneState("open");
+  }, [activeSurfaceId, isPhoneVisible, isProfileOpen, phase]);
+
+  useEffect(() => {
     if (phoneState === "open" && !phoneOpenNotifiedRef.current) {
+      if (mobileDirectOpenRef.current) {
+        mobileDirectOpenRef.current = false;
+        phoneOpenNotifiedRef.current = true;
+        return;
+      }
+
       if (authToken) {
         triggerRandomMessage(authToken)
           .then((response) => {
@@ -693,7 +729,6 @@ export function GameSceneScreen() {
     [activeSurfaceId],
   );
   const isDimWeather = ["rain", "snow", "night"].includes(activeWeatherId);
-  const isPhoneVisible = phoneState !== "closed";
   const isOverlayActive =
     isPhoneVisible || activeSurfaceId !== null || isProfileOpen;
 

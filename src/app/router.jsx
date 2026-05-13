@@ -1,6 +1,7 @@
 import { Navigate, createHashRouter } from "react-router-dom";
 
 import { GameRoute } from "../routes/GameRoute";
+import { InternalUsersRoute } from "../routes/InternalUsersRoute";
 import { LoadingRoute } from "../routes/LoadingRoute";
 import { MainMenuRoute } from "../routes/MainMenuRoute";
 import { SettingsRoute } from "../routes/SettingsRoute";
@@ -29,6 +30,10 @@ export const router = createHashRouter([
       {
         path: "/settings",
         element: <SettingsRoute />,
+      },
+      {
+        path: "/internal/users",
+        element: <InternalUsersRoute />,
       },
     ],
   },

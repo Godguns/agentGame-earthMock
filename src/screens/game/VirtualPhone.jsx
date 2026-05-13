@@ -817,7 +817,7 @@ function PlaceholderApp({ appId, onBack }) {
   );
 }
 
-export function VirtualPhone({ state, onClose }) {
+export function VirtualPhone({ state, onClose, standalone = false }) {
   const navigate = useNavigate();
   const [currentAppId, setCurrentAppId] = useState(null);
   const [pressingAppId, setPressingAppId] = useState(null);
@@ -1052,21 +1052,25 @@ export function VirtualPhone({ state, onClose }) {
     return null;
   }
 
+  const overlayClassName = `virtual-phone-overlay ${
+    standalone ? "virtual-phone-overlay--standalone" : ""
+  } ${state === "closing" ? "is-closing" : "is-open"}`;
+
   return (
     <div
-      className={`virtual-phone-overlay ${
-        state === "closing" ? "is-closing" : "is-open"
-      }`}
-      role="dialog"
-      aria-modal="true"
+      className={overlayClassName}
+      role={standalone ? undefined : "dialog"}
+      aria-modal={standalone ? undefined : "true"}
       aria-label="虚拟手机"
     >
-      <button
+      {!standalone ? (
+        <button
         type="button"
         className="virtual-phone-overlay__backdrop"
         onClick={onClose}
         aria-label="关闭手机"
-      />
+        />
+      ) : null}
 
       <div className="virtual-phone-overlay__sheet-wrap">
         <section

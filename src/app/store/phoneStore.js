@@ -4,7 +4,32 @@ const MAX_NOTIFICATIONS = 24;
 const BANNER_DURATION_MS = 4800;
 const MAX_SERVER_MESSAGE_IDS = 300;
 
-const MOCK_CONVERSATIONS = [];
+function createDefaultConversation({
+  id,
+  name,
+  subtitle,
+  conversationKey,
+}) {
+  return {
+    id,
+    name,
+    subtitle,
+    avatarText: name.slice(0, 1),
+    avatarTone: toneFromId(id),
+    conversationKey,
+    unreadCount: 0,
+    messages: [],
+  };
+}
+
+const MOCK_CONVERSATIONS = [
+  createDefaultConversation({
+    id: "npc:mother",
+    name: "妈妈",
+    subtitle: "可以主动给妈妈发消息。",
+    conversationKey: "npc:mother",
+  }),
+];
 
 const MOCK_NOTIFICATION_TEMPLATES = [
   {

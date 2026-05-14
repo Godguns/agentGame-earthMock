@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocation, useNavigate } from "react-router-dom";
+import { AnimatedContent } from "@appletosolutions/reactbits";
 
 import { hasBoundPersona, useAuthStore } from "../../app/store/authStore";
 import {
@@ -1126,23 +1127,29 @@ export function SettingsScreen() {
         </aside>
 
         <section className="settings-content">
-          {activeSection === "persona" ? (
-            <PersonaCalibrationPanel
-              answers={answers}
-              onAnswerChange={handleAnswerChange}
-              isCalibrationComplete={isCalibrationComplete}
-              onComplete={handleCompleteFlow}
-              completeLabel={
-                isOnboarding ? "Save and enter game" : "Save calibration"
-              }
-              completeDisabled={isCompletingFlow}
-            />
-          ) : (
-            <PlaceholderPanel
-              label={currentSection?.label ?? "设置项"}
-              description={currentSection?.description ?? ""}
-            />
-          )}
+          <AnimatedContent
+            distance={20}
+            direction="horizontal"
+            ease="back.out(1.2)"
+          >
+            {activeSection === "persona" ? (
+              <PersonaCalibrationPanel
+                answers={answers}
+                onAnswerChange={handleAnswerChange}
+                isCalibrationComplete={isCalibrationComplete}
+                onComplete={handleCompleteFlow}
+                completeLabel={
+                  isOnboarding ? "Save and enter game" : "Save calibration"
+                }
+                completeDisabled={isCompletingFlow}
+              />
+            ) : (
+              <PlaceholderPanel
+                label={currentSection?.label ?? "设置项"}
+                description={currentSection?.description ?? ""}
+              />
+            )}
+          </AnimatedContent>
         </section>
       </div>
     </main>

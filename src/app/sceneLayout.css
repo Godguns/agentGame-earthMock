@@ -1,60 +1,48 @@
+/* ====== SceneLayout · 深色科技风布局 ====== */
+
 .scene-layout {
   position: relative;
   min-height: 100dvh;
   isolation: isolate;
   overflow: hidden;
-  background: linear-gradient(180deg, #05070b 0%, #0a0e15 52%, #05060a 100%);
+  background: #000;
 }
 
-.scene-layout::before,
-.scene-layout::after,
-.scene-layout__wash {
-  content: "";
+/* 粒子背景层 */
+.scene-layout__particles {
   position: absolute;
-  inset: -16%;
+  inset: 0;
+  z-index: 0;
   pointer-events: none;
 }
 
-.scene-layout::before {
-  background:
-    radial-gradient(circle at 16% 18%, rgba(255, 255, 255, 0.12), transparent 12%),
-    radial-gradient(circle at 78% 22%, rgba(212, 222, 236, 0.14), transparent 14%),
-    radial-gradient(circle at 68% 76%, rgba(196, 207, 222, 0.12), transparent 16%);
-  filter: blur(60px);
-  opacity: 0.9;
-  animation: scene-wash-drift 24s ease-in-out infinite alternate;
-}
-
-.scene-layout::after {
-  background:
-    radial-gradient(circle at 24% 70%, rgba(244, 247, 252, 0.1), transparent 12%),
-    radial-gradient(circle at 56% 24%, rgba(220, 228, 238, 0.12), transparent 15%),
-    radial-gradient(circle at 86% 58%, rgba(235, 240, 246, 0.08), transparent 10%);
-  filter: blur(72px);
-  opacity: 0.72;
-  animation: scene-wash-drift-reverse 28s ease-in-out infinite alternate;
+.scene-layout__particles > * {
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .scene-layout__wash {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 18%),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.025), transparent 22%);
-  filter: blur(10px);
-  opacity: 0.72;
-  animation: scene-shimmer 14s ease-in-out infinite;
-}
-
-.scene-layout--menu::before {
-  opacity: 0.72;
+    linear-gradient(180deg, rgba(0,0,0,0.55) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.45) 100%),
+    linear-gradient(90deg, rgba(0,0,0,0.25) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.25) 100%);
+  z-index: 1;
 }
 
 .scene-layout--settings::before {
-  opacity: 0.96;
+  display: none;
+}
+
+.scene-layout--settings::after {
+  display: none;
 }
 
 .scene-layout__content {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   min-height: 100dvh;
 }
 
@@ -69,35 +57,3 @@
   min-height: auto;
 }
 
-@keyframes scene-wash-drift {
-  0% {
-    transform: translate3d(-2.4%, -1.8%, 0) scale(1);
-  }
-
-  100% {
-    transform: translate3d(2.8%, 2%, 0) scale(1.12);
-  }
-}
-
-@keyframes scene-wash-drift-reverse {
-  0% {
-    transform: translate3d(2%, -1.2%, 0) scale(1);
-  }
-
-  100% {
-    transform: translate3d(-2.6%, 2.2%, 0) scale(1.1);
-  }
-}
-
-@keyframes scene-shimmer {
-  0%,
-  100% {
-    opacity: 0.42;
-    transform: translateY(0);
-  }
-
-  50% {
-    opacity: 0.88;
-    transform: translateY(-0.8%);
-  }
-}

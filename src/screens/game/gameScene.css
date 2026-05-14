@@ -1,18 +1,19 @@
 .game-scene {
   --scene-shell-rgb: 12, 16, 26;
-  --scene-accent-rgb: 223, 231, 248;
-  --scene-strong-rgb: 249, 251, 255;
-  --lamp-warm-rgb: 255, 212, 140;
-  --neo-cyan-rgb: 114, 226, 255;
-  --neo-pink-rgb: 255, 150, 216;
+  --scene-accent-rgb: 200, 212, 235;
+  --scene-strong-rgb: 240, 244, 255;
+  --lamp-warm-rgb: 255, 200, 120;
+  --neo-cyan-rgb: 255, 255, 255;
+  --neo-pink-rgb: 255, 255, 255;
   position: relative;
   min-height: 100dvh;
   overflow: hidden;
   background:
-    radial-gradient(circle at 18% 18%, rgba(145, 225, 255, 0.22), transparent 28%),
-    radial-gradient(circle at 84% 18%, rgba(255, 194, 218, 0.16), transparent 24%),
-    linear-gradient(180deg, #d7e7f3 0%, #dce8f4 35%, #d4e0ea 100%);
-  color: #39456d;
+    radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.10), transparent 28%),
+    radial-gradient(circle at 84% 24%, rgba(255, 255, 255, 0.07), transparent 26%),
+    radial-gradient(circle at 50% 80%, rgba(255, 255, 255, 0.05), transparent 30%),
+    linear-gradient(180deg, #080808 0%, #0a0a0a 35%, #040404 100%);
+  color: var(--text-primary);
 }
 
 .game-scene__backdrop,
@@ -40,11 +41,12 @@
 
 .game-scene__backdrop {
   background:
-    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.18), transparent 34%),
-    radial-gradient(circle at 50% 0%, rgba(111, 205, 255, 0.18), transparent 32%),
-    radial-gradient(circle at 100% 100%, rgba(255, 194, 218, 0.12), transparent 34%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.22), transparent 30%),
-    #d8e6f1;
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.04), transparent 34%),
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.08), transparent 32%),
+    radial-gradient(circle at 100% 100%, rgba(255, 255, 255, 0.05), transparent 34%),
+    radial-gradient(circle at 0% 80%, rgba(255, 255, 255, 0.04), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 30%),
+    #080808;
 }
 
 .game-scene__grain {
@@ -242,8 +244,8 @@
   pointer-events: none;
   z-index: 4;
   background:
-    radial-gradient(circle at 50% 46%, transparent 34%, rgba(75, 99, 138, 0.08) 64%, rgba(69, 92, 128, 0.18) 100%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.14), transparent 30%, transparent 70%, rgba(88, 109, 141, 0.12));
+    radial-gradient(circle at 50% 46%, transparent 34%, rgba(255, 255, 255, 0.08) 64%, rgba(255, 255, 255, 0.18) 100%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), transparent 30%, transparent 70%, rgba(255, 255, 255, 0.12));
 }
 
 .game-scene__focus {
@@ -979,9 +981,9 @@
     max(18px, env(safe-area-inset-bottom))
     max(18px, env(safe-area-inset-left));
   background:
-    radial-gradient(circle at top, rgba(175, 205, 255, 0.22), transparent 28%),
-    radial-gradient(circle at bottom, rgba(103, 150, 255, 0.16), transparent 32%),
-    linear-gradient(180deg, #09111c 0%, #0d1826 44%, #121f31 100%);
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.22), transparent 28%),
+    radial-gradient(circle at bottom, rgba(255, 255, 255, 0.16), transparent 32%),
+    linear-gradient(180deg, #080808 0%, #0a0a0a 44%, #0a0a0a 100%);
 }
 
 .virtual-phone-overlay--standalone {
@@ -1016,7 +1018,7 @@
   .mobile-phone-screen {
     padding: 0;
     background:
-      linear-gradient(180deg, #0a121d 0%, #0f1a29 46%, #132033 100%);
+      linear-gradient(180deg, #080808 0%, #0a0a0a 46%, #0a0a0a 100%);
   }
 
   .virtual-phone-overlay--standalone {
@@ -1078,7 +1080,7 @@
   box-shadow:
     0 26px 80px rgba(0, 0, 0, 0.38),
     inset 0 1px 0 rgba(255, 255, 255, 0.16),
-    0 0 24px rgba(196, 214, 255, 0.12);
+    0 0 24px rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(26px) saturate(130%);
   -webkit-backdrop-filter: blur(26px) saturate(130%);
   overflow: hidden;
@@ -1128,7 +1130,7 @@
 
 .virtual-phone__eyebrow {
   margin: 0 0 8px;
-  color: rgba(220, 230, 245, 0.42);
+  color: rgba(255, 255, 255, 0.42);
   font-size: 0.72rem;
   letter-spacing: 0.24em;
 }
@@ -1153,7 +1155,7 @@
   gap: 10px;
   border: 0;
   background: transparent;
-  color: rgba(241, 245, 252, 0.94);
+  color: rgba(255, 255, 255, 0.94);
   transition: transform 180ms ease;
 }
 
@@ -1168,7 +1170,7 @@
   border-radius: 22px;
   display: grid;
   place-items: center;
-  color: rgba(247, 249, 255, 0.96);
+  color: rgba(255, 255, 255, 0.96);
   background:
     radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.22), transparent 42%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.05)),
@@ -1215,7 +1217,7 @@
   border-radius: 999px;
   display: grid;
   place-items: center;
-  background: linear-gradient(180deg, #ff7171, #ff4646);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.64));
   color: #fff;
   font-size: 0.66rem;
   font-weight: 600;
@@ -1236,13 +1238,13 @@
 .virtual-phone__back-action {
   border: 0;
   background: transparent;
-  color: rgba(219, 229, 246, 0.88);
+  color: rgba(255, 255, 255, 0.88);
   font: inherit;
   font-size: 0.86rem;
 }
 
 .virtual-phone__app-topbar-title {
-  color: rgba(219, 229, 246, 0.62);
+  color: rgba(255, 255, 255, 0.62);
   font-size: 0.8rem;
   letter-spacing: 0.18em;
 }
@@ -1279,7 +1281,7 @@
 
 .virtual-phone__placeholder p {
   margin: 0;
-  color: rgba(219, 229, 246, 0.68);
+  color: rgba(255, 255, 255, 0.68);
   line-height: 1.7;
 }
 
@@ -1304,8 +1306,8 @@
 
 .surface-overlay--pc .surface-overlay__backdrop {
   background:
-    linear-gradient(180deg, rgba(230, 239, 248, 0.08), rgba(208, 224, 240, 0.12)),
-    rgba(188, 205, 223, 0.08);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.12)),
+    rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(26px) saturate(120%);
   -webkit-backdrop-filter: blur(26px) saturate(120%);
 }
@@ -1363,9 +1365,9 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 22% 16%, rgba(109, 144, 255, 0.3), transparent 28%),
-    radial-gradient(circle at 82% 84%, rgba(145, 116, 255, 0.18), transparent 24%),
-    linear-gradient(180deg, rgba(36, 64, 154, 0.24), rgba(12, 18, 34, 0.16));
+    radial-gradient(circle at 22% 16%, rgba(255, 255, 255, 0.3), transparent 28%),
+    radial-gradient(circle at 82% 84%, rgba(255, 255, 255, 0.18), transparent 24%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(12, 18, 34, 0.16));
 }
 
 .virtual-pc__topbar,
@@ -1790,7 +1792,7 @@
   box-shadow:
     0 28px 90px rgba(0, 0, 0, 0.34),
     inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    0 0 26px rgba(214, 227, 255, 0.08);
+    0 0 26px rgba(255, 255, 255, 0.08);
 }
 
 .virtual-ipod__glow {
@@ -1798,7 +1800,7 @@
   inset: 0;
   background:
     radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.1), transparent 30%),
-    radial-gradient(circle at 50% 82%, rgba(157, 183, 255, 0.12), transparent 24%);
+    radial-gradient(circle at 50% 82%, rgba(255, 255, 255, 0.12), transparent 24%);
   pointer-events: none;
 }
 
@@ -1913,7 +1915,7 @@
   padding: 0;
   border-radius: 18px;
   border: 1px solid rgba(255, 255, 255, 0.16);
-  background: linear-gradient(180deg, #b7d2e8 0%, #d7e6f2 100%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.82) 100%);
   box-shadow:
     0 32px 90px rgba(0, 0, 0, 0.34),
     inset 0 1px 0 rgba(255, 255, 255, 0.28);
@@ -1927,10 +1929,10 @@
   overflow: hidden;
   border-radius: inherit;
   background:
-    radial-gradient(90% 70% at 62% 54%, rgba(14, 70, 255, 0.96) 0%, rgba(14, 70, 255, 0.88) 18%, rgba(71, 181, 255, 0.9) 35%, transparent 42%),
-    radial-gradient(88% 68% at 70% 60%, rgba(8, 38, 204, 0.95) 0%, rgba(8, 38, 204, 0.72) 20%, transparent 35%),
-    radial-gradient(58% 48% at 54% 64%, rgba(84, 208, 255, 0.86) 0%, rgba(84, 208, 255, 0.18) 30%, transparent 42%),
-    linear-gradient(180deg, #9fc3df 0%, #d9e8f3 100%);
+    radial-gradient(90% 70% at 62% 54%, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.88) 18%, rgba(255, 255, 255, 0.9) 35%, transparent 42%),
+    radial-gradient(88% 68% at 70% 60%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.72) 20%, transparent 35%),
+    radial-gradient(58% 48% at 54% 64%, rgba(255, 255, 255, 0.86) 0%, rgba(255, 255, 255, 0.18) 30%, transparent 42%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.64) 0%, rgba(255, 255, 255, 0.82) 100%);
 }
 
 .virtual-pc__desktop-glow {
@@ -1940,7 +1942,7 @@
   aspect-ratio: 1 / 1;
   border-radius: 42% 58% 52% 48%;
   background:
-    radial-gradient(circle at 30% 34%, rgba(117, 218, 255, 0.92), rgba(17, 86, 255, 0.96) 56%, rgba(10, 37, 190, 0.96) 72%, transparent 74%);
+    radial-gradient(circle at 30% 34%, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.96) 56%, rgba(255, 255, 255, 0.96) 72%, transparent 74%);
   filter: blur(2px);
   transform: rotate(-18deg);
   opacity: 0.96;
@@ -2028,7 +2030,7 @@
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 16px;
   background:
-    linear-gradient(180deg, rgba(248, 252, 255, 0.92), rgba(234, 243, 252, 0.82)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.82)),
     rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(26px) saturate(128%);
   -webkit-backdrop-filter: blur(26px) saturate(128%);
@@ -2048,7 +2050,7 @@
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 16px;
   background:
-    linear-gradient(180deg, rgba(248, 252, 255, 0.92), rgba(234, 243, 252, 0.82)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.82)),
     rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(26px) saturate(128%);
   -webkit-backdrop-filter: blur(26px) saturate(128%);
@@ -2060,13 +2062,13 @@
 
 .virtual-pc__search-panel-head {
   height: 44px;
-  border: 1px solid rgba(173, 193, 216, 0.48);
+  border: 1px solid rgba(255, 255, 255, 0.48);
   border-radius: 12px;
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 0 12px;
-  color: rgba(49, 70, 98, 0.78);
+  color: rgba(255, 255, 255, 0.78);
   background: rgba(255, 255, 255, 0.68);
 }
 
@@ -2082,7 +2084,7 @@
 }
 
 .virtual-pc__search-result {
-  border: 1px solid rgba(182, 202, 226, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.42);
   border-radius: 12px;
   display: grid;
   gap: 2px;
@@ -2093,14 +2095,14 @@
 
 .virtual-pc__search-result strong,
 .virtual-pc__quick-panel strong {
-  color: #213247;
+  color: rgba(255, 255, 255, 0.56);
   font-size: 0.84rem;
   font-weight: 600;
 }
 
 .virtual-pc__search-result span,
 .virtual-pc__quick-panel p {
-  color: rgba(60, 78, 102, 0.76);
+  color: rgba(255, 255, 255, 0.76);
   font-size: 0.74rem;
 }
 
@@ -2114,7 +2116,7 @@
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 14px;
   background:
-    linear-gradient(180deg, rgba(248, 252, 255, 0.92), rgba(234, 243, 252, 0.82)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.82)),
     rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(24px) saturate(126%);
   -webkit-backdrop-filter: blur(24px) saturate(126%);
@@ -2130,14 +2132,14 @@
 
 .virtual-pc__start-search {
   height: 48px;
-  border: 1px solid rgba(173, 193, 216, 0.48);
+  border: 1px solid rgba(255, 255, 255, 0.48);
   border-radius: 12px;
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 0 14px;
   background: rgba(255, 255, 255, 0.68);
-  color: rgba(49, 70, 98, 0.78);
+  color: rgba(255, 255, 255, 0.78);
   font-size: 0.86rem;
 }
 
@@ -2159,7 +2161,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
-  color: #1e2d42;
+  color: rgba(255, 255, 255, 0.56);
 }
 
 .virtual-pc__start-section-head strong {
@@ -2169,7 +2171,7 @@
 
 .virtual-pc__start-section-head span {
   font-size: 0.78rem;
-  color: rgba(58, 74, 96, 0.72);
+  color: rgba(255, 255, 255, 0.72);
 }
 
 .virtual-pc__start-grid {
@@ -2179,7 +2181,7 @@
 }
 
 .virtual-pc__start-app {
-  border: 1px solid rgba(182, 202, 226, 0.48);
+  border: 1px solid rgba(255, 255, 255, 0.48);
   border-radius: 12px;
   display: grid;
   grid-template-columns: 46px 1fr;
@@ -2196,8 +2198,8 @@
   border-radius: 10px;
   display: grid;
   place-items: center;
-  background: rgba(242, 247, 252, 0.96);
-  color: #213247;
+  background: rgba(255, 255, 255, 0.96);
+  color: rgba(255, 255, 255, 0.56);
 }
 
 .virtual-pc__start-app-icon svg {
@@ -2212,23 +2214,23 @@
 }
 
 .virtual-pc__start-app-copy strong {
-  color: #1d3047;
+  color: rgba(255, 255, 255, 0.56);
   font-size: 0.82rem;
   font-weight: 600;
 }
 
 .virtual-pc__start-app-copy em {
-  color: rgba(60, 78, 102, 0.72);
+  color: rgba(255, 255, 255, 0.72);
   font-size: 0.72rem;
   font-style: normal;
 }
 
 .virtual-pc__recommend-card {
   padding: 14px 16px;
-  border: 1px solid rgba(182, 202, 226, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.42);
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.62);
-  color: #213247;
+  color: rgba(255, 255, 255, 0.56);
 }
 
 .virtual-pc__recommend-card strong {
@@ -2239,7 +2241,7 @@
 
 .virtual-pc__recommend-card p {
   margin: 0;
-  color: rgba(60, 78, 102, 0.8);
+  color: rgba(255, 255, 255, 0.8);
   font-size: 0.8rem;
   line-height: 1.6;
 }
@@ -2251,11 +2253,11 @@
   z-index: 4;
   width: min(620px, calc(100% - 120px));
   min-height: 340px;
-  border: 1px solid rgba(217, 231, 246, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.72);
   border-radius: 14px;
   overflow: hidden;
   background:
-    linear-gradient(180deg, rgba(248, 252, 255, 0.95), rgba(238, 246, 253, 0.9)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(238, 246, 253, 0.9)),
     rgba(255, 255, 255, 0.78);
   backdrop-filter: blur(22px) saturate(124%);
   -webkit-backdrop-filter: blur(22px) saturate(124%);
@@ -2272,7 +2274,7 @@
   z-index: 4;
   width: min(1240px, calc(100% - 40px));
   height: min(88%, 760px);
-  border: 1px solid rgba(74, 79, 86, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.92);
   border-radius: 12px;
   overflow: hidden;
   background: #252525;
@@ -2372,14 +2374,14 @@
   border-radius: 12px;
   display: grid;
   place-items: center;
-  background: #eceff6;
-  color: #25364a;
+  background: rgba(255, 255, 255, 0.88);
+  color: rgba(255, 255, 255, 0.56);
   font-size: 0.88rem;
   font-weight: 600;
 }
 
 .virtual-pc__chat-avatar.is-green {
-  background: linear-gradient(180deg, #bdf3c4, #74db8e);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.64));
 }
 
 .virtual-pc__chat-thread-copy {
@@ -2422,7 +2424,7 @@
   border-radius: 999px;
   display: grid;
   place-items: center;
-  background: #ff5c5c;
+  background: rgba(255, 255, 255, 0.64);
   color: #fff;
   font-size: 0.74rem;
 }
@@ -2468,8 +2470,8 @@
   aspect-ratio: 16 / 9;
   border-radius: 10px;
   background:
-    radial-gradient(circle at 60% 46%, rgba(44, 117, 255, 0.92), rgba(44, 117, 255, 0.08) 30%, transparent 34%),
-    linear-gradient(180deg, #bdd6eb 0%, #dfeaf4 100%);
+    radial-gradient(circle at 60% 46%, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.08) 30%, transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.82) 100%);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
@@ -2498,8 +2500,8 @@
 }
 
 .virtual-pc__chat-bubble-row.is-me .virtual-pc__chat-bubble {
-  background: #2dc977;
-  color: #0f1a12;
+  background: rgba(255, 255, 255, 0.72);
+  color: rgba(255, 255, 255, 0.64);
 }
 
 .virtual-pc__chat-compose {
@@ -2599,7 +2601,7 @@
 
 .virtual-pc__app-window--terminal {
   background: rgba(8, 10, 14, 0.94);
-  border-color: rgba(104, 126, 154, 0.3);
+  border-color: rgba(255, 255, 255, 0.3);
   box-shadow:
     0 28px 62px rgba(3, 6, 12, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
@@ -2612,12 +2614,12 @@
   justify-content: space-between;
   padding: 0 14px;
   background: rgba(255, 255, 255, 0.12);
-  color: #16304c;
+  color: rgba(255, 255, 255, 0.64);
 }
 
 .virtual-pc__app-window--terminal .virtual-pc__app-window-head {
   background: rgba(255, 255, 255, 0.04);
-  color: rgba(236, 244, 255, 0.9);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .virtual-pc__window-dots {
@@ -2646,13 +2648,13 @@
 
 .virtual-pc__app-window-body p {
   margin: 8px 0 0;
-  color: rgba(28, 46, 67, 0.82);
+  color: rgba(255, 255, 255, 0.82);
   line-height: 1.8;
 }
 
 .virtual-pc__terminal-body {
   padding: 18px 18px 22px;
-  color: #9ff0bd;
+  color: rgba(255, 255, 255, 0.72);
   font-family: Consolas, "SFMono-Regular", monospace;
   font-size: 0.84rem;
   line-height: 1.8;
@@ -2665,7 +2667,7 @@
 
 .virtual-pc__terminal-prefix {
   margin-right: 8px;
-  color: #6adf93;
+  color: rgba(255, 255, 255, 0.64);
 }
 
 .virtual-pc__terminal-line.is-input {
@@ -2682,9 +2684,9 @@
   min-width: 0;
   border: 0;
   background: transparent;
-  color: #9ff0bd;
+  color: rgba(255, 255, 255, 0.72);
   font: inherit;
-  caret-color: #9ff0bd;
+  caret-color: rgba(255, 255, 255, 0.72);
 }
 
 .virtual-pc__terminal-input:focus {
@@ -3861,7 +3863,7 @@
   place-items: center;
   background:
     radial-gradient(circle at 28% 24%, rgba(255, 255, 255, 0.34), transparent 48%),
-    linear-gradient(180deg, rgba(141, 189, 255, 0.28), rgba(141, 189, 255, 0.08));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.08));
   color: rgba(255, 255, 255, 0.96);
   font-size: 0.98rem;
   letter-spacing: 0.08em;
@@ -3900,9 +3902,9 @@
   padding: 18px 18px 26px;
   background:
     radial-gradient(circle at 10% 12%, rgba(255, 255, 255, 0.08), transparent 28%),
-    radial-gradient(circle at 88% 10%, rgba(164, 193, 255, 0.12), transparent 24%),
+    radial-gradient(circle at 88% 10%, rgba(255, 255, 255, 0.12), transparent 24%),
     linear-gradient(180deg, rgba(18, 24, 34, 0.96), rgba(12, 16, 24, 0.98));
-  color: rgba(246, 249, 255, 0.96);
+  color: rgba(255, 255, 255, 0.96);
 }
 
 .virtual-phone__home,
@@ -3918,7 +3920,7 @@
 
 .virtual-phone__eyebrow {
   margin: 0;
-  color: rgba(214, 224, 240, 0.52);
+  color: rgba(255, 255, 255, 0.52);
   font-size: 0.72rem;
   letter-spacing: 0.22em;
 }
@@ -3932,7 +3934,7 @@
 
 .virtual-phone__hero-copy {
   margin: 0;
-  color: rgba(214, 224, 240, 0.7);
+  color: rgba(255, 255, 255, 0.7);
   font-size: 0.84rem;
   line-height: 1.75;
 }
@@ -3965,7 +3967,7 @@
   place-items: center;
   background:
     radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.24), transparent 46%),
-    linear-gradient(180deg, rgba(141, 189, 255, 0.32), rgba(141, 189, 255, 0.08));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0.08));
   color: rgba(255, 255, 255, 0.96);
   font-size: 0.84rem;
 }
@@ -3983,7 +3985,7 @@
 
 .virtual-phone__notification-copy p {
   margin: 0;
-  color: rgba(214, 224, 240, 0.72);
+  color: rgba(255, 255, 255, 0.72);
   font-size: 0.76rem;
   line-height: 1.45;
 }
@@ -4046,14 +4048,14 @@
   border-radius: 999px;
   display: grid;
   place-items: center;
-  background: #ff6868;
+  background: rgba(255, 255, 255, 0.64);
   color: #fff;
   font-size: 0.7rem;
   font-weight: 600;
 }
 
 .virtual-phone__app-label {
-  color: rgba(246, 249, 255, 0.9);
+  color: rgba(255, 255, 255, 0.9);
   font-size: 0.78rem;
   line-height: 1.2;
 }
@@ -4072,12 +4074,12 @@
 .virtual-phone__back-action {
   border: 0;
   background: transparent;
-  color: rgba(182, 208, 255, 0.92);
+  color: rgba(255, 255, 255, 0.92);
   font: inherit;
 }
 
 .virtual-phone__app-topbar-title {
-  color: rgba(246, 249, 255, 0.92);
+  color: rgba(255, 255, 255, 0.92);
   font-size: 1rem;
   font-weight: 600;
 }
@@ -4114,15 +4116,15 @@
 }
 
 .virtual-phone__messages-avatar--sunset {
-  background: linear-gradient(135deg, rgba(255, 177, 126, 0.84), rgba(255, 120, 157, 0.72));
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.84), rgba(255, 255, 255, 0.72));
 }
 
 .virtual-phone__messages-avatar--mist {
-  background: linear-gradient(135deg, rgba(186, 204, 255, 0.84), rgba(127, 165, 255, 0.74));
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.84), rgba(255, 255, 255, 0.74));
 }
 
 .virtual-phone__messages-avatar--azure {
-  background: linear-gradient(135deg, rgba(87, 179, 255, 0.84), rgba(82, 115, 255, 0.74));
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.84), rgba(255, 255, 255, 0.74));
 }
 
 .virtual-phone__messages-body {
@@ -4137,7 +4139,7 @@
 }
 
 .virtual-phone__messages-body em {
-  color: rgba(214, 224, 240, 0.64);
+  color: rgba(255, 255, 255, 0.64);
   font-size: 0.76rem;
   font-style: normal;
   white-space: nowrap;
@@ -4152,7 +4154,7 @@
 }
 
 .virtual-phone__messages-meta small {
-  color: rgba(214, 224, 240, 0.48);
+  color: rgba(255, 255, 255, 0.48);
   font-size: 0.72rem;
 }
 
@@ -4163,7 +4165,7 @@
   border-radius: 999px;
   display: grid;
   place-items: center;
-  background: #ff6868;
+  background: rgba(255, 255, 255, 0.64);
   color: #fff;
   font-size: 0.68rem;
   font-weight: 600;
@@ -4197,7 +4199,7 @@
 }
 
 .virtual-phone__chat-bubble-wrap small {
-  color: rgba(214, 224, 240, 0.42);
+  color: rgba(255, 255, 255, 0.42);
   font-size: 0.7rem;
 }
 
@@ -4206,14 +4208,14 @@
   padding: 12px 14px;
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.08);
-  color: rgba(246, 249, 255, 0.94);
+  color: rgba(255, 255, 255, 0.94);
   font-size: 0.84rem;
   line-height: 1.7;
 }
 
 .virtual-phone__chat-row.is-me .virtual-phone__chat-bubble {
   background: linear-gradient(180deg, rgba(139, 199, 255, 0.96), rgba(106, 161, 255, 0.88));
-  color: #0b1625;
+  color: rgba(255, 255, 255, 0.48);
 }
 
 .virtual-phone__messages-composer {
@@ -4239,7 +4241,7 @@
   border: 0;
   resize: none;
   background: transparent;
-  color: rgba(246, 249, 255, 0.94);
+  color: rgba(255, 255, 255, 0.94);
   font: inherit;
 }
 
@@ -4254,7 +4256,7 @@
   border-radius: 999px;
   padding: 9px 16px;
   background: linear-gradient(180deg, rgba(139, 199, 255, 0.96), rgba(106, 161, 255, 0.88));
-  color: #08121d;
+  color: rgba(255, 255, 255, 0.44);
   font: inherit;
   font-weight: 600;
 }
@@ -4300,7 +4302,7 @@
 .virtual-phone__placeholder p {
   margin: 0;
   max-width: 240px;
-  color: rgba(214, 224, 240, 0.7);
+  color: rgba(255, 255, 255, 0.7);
   font-size: 0.82rem;
   line-height: 1.7;
 }
@@ -4318,7 +4320,7 @@
 }
 
 .virtual-phone {
-  --phone-text-strong: #22324f;
+  --phone-text-strong: rgba(255, 255, 255, 0.56);
   --phone-text-soft: rgba(34, 50, 79, 0.7);
   --phone-text-muted: rgba(34, 50, 79, 0.46);
   --phone-panel-bg:
@@ -4370,7 +4372,7 @@
 .virtual-phone--night .virtual-phone__screen {
   background:
     radial-gradient(circle at 10% 12%, rgba(255, 255, 255, 0.08), transparent 28%),
-    radial-gradient(circle at 88% 10%, rgba(164, 193, 255, 0.12), transparent 24%),
+    radial-gradient(circle at 88% 10%, rgba(255, 255, 255, 0.12), transparent 24%),
     linear-gradient(180deg, rgba(18, 24, 34, 0.96), rgba(12, 16, 24, 0.98));
 }
 
@@ -4517,7 +4519,7 @@
 
 .virtual-phone__chat-row.is-me .virtual-phone__chat-bubble {
   background: var(--phone-bubble-me);
-  color: #102038;
+  color: rgba(255, 255, 255, 0.48);
 }
 
 .virtual-phone__messages-composer {
@@ -5269,7 +5271,7 @@
 
 .virtual-phone__theme-program.is-active .virtual-phone__theme-program-mark {
   background: linear-gradient(180deg, rgba(174, 204, 255, 0.94), rgba(133, 173, 255, 0.9));
-  color: #132746;
+  color: rgba(255, 255, 255, 0.52);
 }
 
 .virtual-phone--night .virtual-phone__theme-program.is-active {
@@ -5449,7 +5451,7 @@
   align-items: center !important;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent 60%),
-    rgba(219, 229, 246, 0.12) !important;
+    rgba(255, 255, 255, 0.12) !important;
   border: 1px solid rgba(255, 255, 255, 0.16) !important;
   box-shadow:
     0 8px 20px rgba(114, 136, 175, 0.05),
@@ -5622,7 +5624,7 @@
   background:
     radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.18), transparent 32%),
     radial-gradient(circle at 84% 8%, rgba(177, 206, 255, 0.12), transparent 34%),
-    linear-gradient(180deg, rgba(247, 249, 255, 0.12), rgba(241, 245, 255, 0.08)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(241, 245, 255, 0.08)),
     rgba(235, 242, 254, 0.08) !important;
   border: 1px solid rgba(255, 255, 255, 0.18) !important;
   box-shadow:
@@ -5639,7 +5641,7 @@
 
 .virtual-phone--night .virtual-phone__notification-center {
   background:
-    radial-gradient(circle at 18% 0%, rgba(157, 183, 255, 0.08), transparent 32%),
+    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.08), transparent 32%),
     radial-gradient(circle at 84% 8%, rgba(82, 116, 193, 0.09), transparent 34%),
     linear-gradient(180deg, rgba(14, 21, 37, 0.26), rgba(11, 16, 28, 0.18)),
     rgba(8, 13, 24, 0.18) !important;

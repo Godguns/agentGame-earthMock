@@ -5,7 +5,8 @@ export function GamePanel({
   className = "",
   compact = false,
   soft = false,
-  showSlashes = true,
+  frosted = false,
+  showSlashes = false,
 }) {
   return (
     <section
@@ -13,6 +14,7 @@ export function GamePanel({
         "game-ui-panel",
         compact ? "game-ui-panel--compact" : "",
         soft ? "game-ui-panel--soft" : "",
+        frosted ? "game-ui-panel--frosted" : "",
         className,
       ]
         .filter(Boolean)

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { DecryptedText } from "@appletosolutions/reactbits";
 
 import { ParticleField } from "../../components/atmosphere/ParticleField";
 import { ScanlineOverlay } from "../../components/atmosphere/ScanlineOverlay";
@@ -66,7 +67,15 @@ export function LoadingScreen() {
           }`}
         >
           <p className="loading-screen__eyebrow">EARTH ONLINE</p>
-          <h1 className="loading-screen__title">地球Online</h1>
+          <h1 className="loading-screen__title">
+            <DecryptedText
+              text="地球Online"
+              speed={55}
+              animateOn="view"
+              className="loading-screen__title"
+              encryptedClassName="loading-screen__title"
+            />
+          </h1>
           <div className="loading-screen__title-rule" />
           <p className="loading-screen__subtitle">
             // LIFE SIMULATION ENGINE v1.0

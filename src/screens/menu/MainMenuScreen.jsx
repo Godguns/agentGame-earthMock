@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocation, useNavigate } from "react-router-dom";
+import { ShinyText } from "../../components/ui/ShinyText";
+import { GlareHover, ClickSpark } from "@appletosolutions/reactbits";
 
 import { hasBoundPersona, useAuthStore } from "../../app/store/authStore";
 import godgunsAvatar from "../../../godguns.jpg";
@@ -158,7 +160,7 @@ function SessionStatusCard({
             tone: "ready",
             badge: "已就绪",
             title: user.username,
-            detail: "账号已连接，可以进入 Earth Online",
+            detail: " Earth Online",
           }
         : {
             tone: "pending",
@@ -545,40 +547,61 @@ export function MainMenuScreen() {
         } ${isAboutOpen ? "is-about-open" : ""}`}
       >
         <div className="menu-screen__backdrop" />
-        <section className="menu-screen__panel">
-          <SessionStatusCard
-            user={user}
-            persona={persona}
-            personaStatus={personaStatus}
-            onOpenAuth={() => setIsAuthOpen(true)}
-            onLogout={clearSession}
-            onCalibrate={handleOpenCalibration}
-          />
+          <section className="menu-screen__panel">
+            <GlareHover
+              width="100%"
+              height="auto"
+              background="transparent"
+              borderRadius="20px"
+              borderColor="transparent"
+              glareColor="rgba(255,255,255,0.3)"
+              glareOpacity={0.4}
+              glareSize={180}
+            >
+              <SessionStatusCard
+                user={user}
+                persona={persona}
+                personaStatus={personaStatus}
+                onOpenAuth={() => setIsAuthOpen(true)}
+                onLogout={clearSession}
+                onCalibrate={handleOpenCalibration}
+              />
+            </GlareHover>
 
-          <p className="menu-screen__eyebrow">MAIN MENU</p>
-          <h1 className="menu-screen__title">Earth Online</h1>
-          <p className="menu-screen__summary">
-            The world checks your login and persona state before opening the next
-            scene.
-          </p>
+            <p className="menu-screen__eyebrow">MAIN MENU</p>
+            <h1 className="menu-screen__title">
+              <ShinyText text="Earth Online" speed={3} />
+            </h1>
+            <p className="menu-screen__summary">
+              The world checks your login and persona state before opening the next
+              scene.
+            </p>
 
-          <nav aria-label={menuLabel}>
-            <ul className="menu-screen__list">
-              {MENU_ITEMS.map((item) => (
-                <li key={item.action}>
-                  <button
-                    className="menu-screen__button"
-                    type="button"
-                    onClick={() => handleAction(item.action)}
-                    disabled={isStarting || status === "loading"}
-                  >
-                    {item.action === "start" && isStarting ? "Checking..." : item.label}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </section>
+            <nav aria-label={menuLabel}>
+              <ul className="menu-screen__list">
+                {MENU_ITEMS.map((item) => (
+                  <li key={item.action}>
+                    <ClickSpark
+                      sparkColor="rgba(255,255,255,0.4)"
+                      sparkSize={8}
+                      sparkRadius={16}
+                      sparkCount={6}
+                      duration={400}
+                    >
+                      <button
+                        className="menu-screen__button"
+                        type="button"
+                        onClick={() => handleAction(item.action)}
+                        disabled={isStarting || status === "loading"}
+                      >
+                        {item.action === "start" && isStarting ? "Checking..." : item.label}
+                      </button>
+                    </ClickSpark>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </section>
       </main>
 
       {isAboutOpen ? <AboutOverlay onClose={() => setIsAboutOpen(false)} /> : null}

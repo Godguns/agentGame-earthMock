@@ -17,8 +17,8 @@
 .ambient-glow-field__mist {
   background:
     radial-gradient(circle at 25% 18%, rgba(255, 255, 255, 0.11), transparent 22%),
-    radial-gradient(circle at 72% 22%, rgba(210, 220, 235, 0.11), transparent 26%),
-    radial-gradient(circle at 58% 72%, rgba(190, 202, 220, 0.08), transparent 28%);
+    radial-gradient(circle at 72% 22%, rgba(255, 255, 255, 0.11), transparent 26%),
+    radial-gradient(circle at 58% 72%, rgba(255, 255, 255, 0.08), transparent 28%);
   filter: blur(56px);
   animation: ambient-mist-drift 28s ease-in-out infinite alternate;
   opacity: 1;
@@ -31,21 +31,21 @@
   height: var(--glow-size);
   inset: auto;
   border-radius: 999px;
-  background: radial-gradient(circle, rgba(240, 245, 251, 0.22), transparent 62%);
-  filter: blur(48px);
+  background: radial-gradient(circle at 42% 44%, rgba(255, 255, 255, 0.13), transparent 68%);
+  filter: blur(72px);
   transform: translate(-50%, -50%);
   animation: ambient-orb-float var(--glow-duration) ease-in-out infinite;
   animation-delay: var(--glow-delay);
-  opacity: 0.92;
+  opacity: 0.52;
 }
 
 .ambient-glow-field__specks {
   background:
     radial-gradient(circle at 22% 26%, rgba(255, 255, 255, 0.12) 0, transparent 2px),
-    radial-gradient(circle at 32% 68%, rgba(228, 234, 242, 0.12) 0, transparent 2px),
-    radial-gradient(circle at 58% 22%, rgba(211, 221, 232, 0.11) 0, transparent 2px),
-    radial-gradient(circle at 74% 44%, rgba(235, 239, 245, 0.1) 0, transparent 2px),
-    radial-gradient(circle at 84% 74%, rgba(213, 223, 233, 0.1) 0, transparent 2px);
+    radial-gradient(circle at 32% 68%, rgba(255, 255, 255, 0.12) 0, transparent 2px),
+    radial-gradient(circle at 58% 22%, rgba(255, 255, 255, 0.11) 0, transparent 2px),
+    radial-gradient(circle at 74% 44%, rgba(255, 255, 255, 0.1) 0, transparent 2px),
+    radial-gradient(circle at 84% 74%, rgba(255, 255, 255, 0.1) 0, transparent 2px);
   filter: blur(0.5px);
   opacity: 0.78;
   animation: ambient-specks-twinkle 10s ease-in-out infinite;
@@ -53,17 +53,53 @@
 
 .ambient-glow-field--menu .ambient-glow-field__mist {
   background:
-    radial-gradient(circle at 28% 18%, rgba(255, 249, 245, 0.09), transparent 22%),
-    radial-gradient(circle at 72% 26%, rgba(211, 220, 236, 0.11), transparent 24%),
-    radial-gradient(circle at 58% 70%, rgba(215, 223, 234, 0.08), transparent 28%);
+    radial-gradient(circle at 28% 18%, rgba(255, 255, 255, 0.07), transparent 24%),
+    radial-gradient(circle at 72% 26%, rgba(255, 255, 255, 0.08), transparent 26%),
+    radial-gradient(circle at 58% 70%, rgba(255, 255, 255, 0.05), transparent 30%);
+  opacity: 0.5;
 }
 
 .ambient-glow-field--menu .ambient-glow-field__orb {
-  background: radial-gradient(circle, rgba(233, 237, 244, 0.18), transparent 62%);
+  display: none;
+}
+
+.ambient-glow-field--menu .ambient-glow-field__specks {
+  opacity: 0.3;
 }
 
 .ambient-glow-field--settings .ambient-glow-field__orb {
-  background: radial-gradient(circle, rgba(240, 245, 251, 0.24), transparent 62%);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.24), transparent 62%);
+}
+
+@keyframes ambient-orb-float-alt {
+  0% {
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    opacity: var(--orb-base-opacity, 0.52);
+  }
+
+  30% {
+    transform: translate(calc(-50% - 1.8rem), calc(-50% + 0.6rem)) scale(1.08) rotate(-4deg);
+    opacity: calc(var(--orb-base-opacity, 0.52) * 0.85);
+  }
+
+  60% {
+    transform: translate(calc(-50% - 0.6rem), calc(-50% - 1.6rem)) scale(1.04) rotate(2deg);
+    opacity: calc(var(--orb-base-opacity, 0.52) * 1.05);
+  }
+
+  85% {
+    transform: translate(calc(-50% + 1.2rem), calc(-50% - 0.4rem)) scale(1.1) rotate(-1deg);
+    opacity: calc(var(--orb-base-opacity, 0.52) * 0.92);
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    opacity: var(--orb-base-opacity, 0.52);
+  }
+}
+
+.ambient-glow-field__orb--alt {
+  animation-name: ambient-orb-float-alt;
 }
 
 @keyframes ambient-mist-drift {
@@ -77,13 +113,29 @@
 }
 
 @keyframes ambient-orb-float {
-  0%,
-  100% {
-    transform: translate(-50%, -50%) scale(1);
+  0% {
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    opacity: var(--orb-base-opacity, 0.52);
   }
 
-  50% {
-    transform: translate(calc(-50% + 2.6rem), calc(-50% - 1.8rem)) scale(1.14);
+  25% {
+    transform: translate(calc(-50% + 1.4rem), calc(-50% - 1.1rem)) scale(1.06) rotate(3deg);
+    opacity: calc(var(--orb-base-opacity, 0.52) * 0.8);
+  }
+
+  55% {
+    transform: translate(calc(-50% + 2.2rem), calc(-50% + 0.8rem)) scale(1.1) rotate(-2deg);
+    opacity: calc(var(--orb-base-opacity, 0.52) * 1.1);
+  }
+
+  80% {
+    transform: translate(calc(-50% - 0.8rem), calc(-50% + 1.4rem)) scale(1.04) rotate(1deg);
+    opacity: calc(var(--orb-base-opacity, 0.52) * 0.9);
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    opacity: var(--orb-base-opacity, 0.52);
   }
 }
 

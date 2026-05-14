@@ -17,7 +17,7 @@ export function AmbientGlowField({ variant = "silver" }) {
       {DEFAULT_LAYERS.map((layer, index) => (
         <span
           key={`${variant}-${index}`}
-          className="ambient-glow-field__orb"
+          className={`ambient-glow-field__orb${index % 2 === 1 ? " ambient-glow-field__orb--alt" : ""}`}
           style={{
             "--glow-x": layer.x,
             "--glow-y": layer.y,

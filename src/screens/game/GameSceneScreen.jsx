@@ -11,7 +11,13 @@ import {
   fetchLiveWeather,
   getWeatherDisplayName,
 } from "../../services/openMeteoWeather";
-import { pollMessages, triggerRandomMessage } from "../../services/earthMockApi";
+import {
+  fetchStoryState,
+  pollMessages,
+  startStoryBranch,
+  submitStoryChoice,
+  triggerRandomMessage,
+} from "../../services/earthMockApi";
 import { PersonaProfilePanel } from "./PersonaProfilePanel";
 import {
   GAME_SCENE_ASSETS,
@@ -22,7 +28,10 @@ import { VirtualIpad } from "./VirtualIpad";
 import { VirtualIpod } from "./VirtualIpod";
 import { VirtualPc } from "./VirtualPc";
 import { VirtualPhone } from "./VirtualPhone";
+import { WorldPulseBoard } from "../../components/world/WorldPulseBoard";
+import { StoryCinematicOverlay } from "../../components/story/StoryCinematicOverlay";
 import "./gameScene.css";
+import { useWorldStore } from "../../app/store/worldStore";
 
 const MOCK_NOTIFICATION_INTERVAL_MS = 3 * 60 * 1000;
 const WEATHER_REFRESH_INTERVAL_MS = 20 * 60 * 1000;
@@ -361,6 +370,10 @@ export function GameSceneScreen() {
   const [phoneState, setPhoneState] = useState("closed");
   const [isIphonePressing, setIsIphonePressing] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isStoryOpen, setIsStoryOpen] = useState(false);
+  const [storyChoiceFeedback, setStoryChoiceFeedback] = useState(null);
+  const [storyState, setStoryState] = useState(null);
+  const [storyStatus, setStoryStatus] = useState("idle");
   const [personaProfile, setPersonaProfile] = useState(() =>
     buildPersonaProfile(readStoredPersonaAnswers() || {}),
   );
@@ -379,6 +392,7 @@ export function GameSceneScreen() {
   const dismissNotificationBanner = usePhoneStore(
     (state) => state.dismissNotificationBanner,
   );
+  const hydrateWorld = useWorldStore((state) => state.hydrateWorld);
   const [weatherState, setWeatherState] = useState({
     status: "idle",
     sceneId: "cloudy",
@@ -420,6 +434,48 @@ export function GameSceneScreen() {
 
     return undefined;
   }, [authToken, loadPersona, navigate, persona]);
+
+  useEffect(() => {
+    if (!authToken) {
+      return undefined;
+    }
+
+    hydrateWorld(authToken).catch((error) => {
+      console.warn("Failed to load world state.", error);
+    });
+
+    return undefined;
+  }, [authToken, hydrateWorld]);
+
+  useEffect(() => {
+    if (!authToken) {
+      setStoryState(null);
+      return undefined;
+    }
+
+    let cancelled = false;
+    setStoryStatus("loading");
+
+    fetchStoryState(authToken)
+      .then((payload) => {
+        if (cancelled) {
+          return;
+        }
+        setStoryState(payload);
+        setStoryStatus("ready");
+      })
+      .catch((error) => {
+        if (cancelled) {
+          return;
+        }
+        console.warn("Failed to load story state.", error);
+        setStoryStatus("error");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [authToken]);
 
   useEffect(() => {
     preloadGameSceneAssets();
@@ -665,6 +721,11 @@ export function GameSceneScreen() {
         return;
       }
 
+      if (isStoryOpen) {
+        setIsStoryOpen(false);
+        return;
+      }
+
       if (phase === "awake") {
         setPersonaProfile(resolvedPersonaProfile);
         setIsProfileOpen(true);
@@ -678,7 +739,15 @@ export function GameSceneScreen() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [activeSurfaceId, isProfileOpen, navigate, phase, phoneState, resolvedPersonaProfile]);
+  }, [
+    activeSurfaceId,
+    isProfileOpen,
+    isStoryOpen,
+    navigate,
+    phase,
+    phoneState,
+    resolvedPersonaProfile,
+  ]);
 
   const activeWeather =
     WEATHER_OPTIONS.find((option) => option.id === activeWeatherId) ??
@@ -696,6 +765,12 @@ export function GameSceneScreen() {
   const isDimWeather = ["rain", "snow", "night"].includes(activeWeatherId);
   const isOverlayActive =
     isPhoneVisible || activeSurfaceId !== null || isProfileOpen;
+  const activeStoryScene = storyState?.scene || null;
+  const storyBranches = storyState?.branches || [];
+  const activeStoryTitle = activeStoryScene?.title || "人生主线";
+  const activeStorySubtitle = activeStoryScene
+    ? "根据你当前的人格、关系和处境推进后续人生。"
+    : "先选择一条更适合当前设定的主剧情分支。";
 
   const handlePhoneOpen = () => {
     if (phase !== "awake" || isPhoneVisible || activeSurfaceId || isProfileOpen) {
@@ -724,6 +799,43 @@ export function GameSceneScreen() {
 
   const handleRefreshWeather = () => {
     setWeatherRefreshToken((current) => current + 1);
+  };
+
+  const handleStoryStart = async (branch) => {
+    if (!authToken) {
+      return;
+    }
+
+    try {
+      setStoryStatus("loading");
+      const nextState = await startStoryBranch(branch.key, authToken);
+      setStoryState(nextState);
+      setStoryChoiceFeedback(`主线已进入「${branch.label}」`);
+      setStoryStatus("ready");
+    } catch (error) {
+      console.warn("Failed to start story branch.", error);
+      setStoryStatus("error");
+    }
+  };
+
+  const handleStoryChoice = async (choice) => {
+    if (!authToken) {
+      return;
+    }
+
+    try {
+      setStoryStatus("loading");
+      const nextState = await submitStoryChoice(choice.key, authToken);
+      setStoryState(nextState);
+      setStoryChoiceFeedback(choice.label);
+      setStoryStatus("ready");
+      if (!nextState?.scene) {
+        setIsStoryOpen(false);
+      }
+    } catch (error) {
+      console.warn("Failed to submit story choice.", error);
+      setStoryStatus("error");
+    }
   };
 
   const renderActiveSurface = () => {
@@ -991,6 +1103,15 @@ export function GameSceneScreen() {
         <strong>按 Esc 查看人格档案</strong>
       </button>
 
+      <button
+        type="button"
+        className="game-scene__story-trigger"
+        onClick={() => setIsStoryOpen(true)}
+      >
+        <span>STORY</span>
+        <strong>打开主剧情</strong>
+      </button>
+
       <div className="game-scene__status">
         <span>
           状态：刚醒，还没彻底回到现实。台灯
@@ -1008,7 +1129,25 @@ export function GameSceneScreen() {
       </div>
 
       {activeSurface ? renderActiveSurface() : null}
+      <WorldPulseBoard />
       <VirtualPhone state={phoneState} onClose={handlePhoneClose} />
+      <StoryCinematicOverlay
+        open={isStoryOpen}
+        title={activeStoryTitle}
+        subtitle={activeStorySubtitle}
+        loading={storyStatus === "loading"}
+        lines={activeStoryScene?.lines || []}
+        choices={activeStoryScene?.choices || []}
+        branchOptions={!activeStoryScene ? storyBranches : []}
+        onStart={handleStoryStart}
+        onChoose={handleStoryChoice}
+        onClose={() => setIsStoryOpen(false)}
+      />
+      {storyChoiceFeedback ? (
+        <div className="game-scene__story-toast" role="status" aria-live="polite">
+          已选择：{storyChoiceFeedback}
+        </div>
+      ) : null}
       {isProfileOpen ? (
         <PersonaProfilePanel
           profile={personaProfile}

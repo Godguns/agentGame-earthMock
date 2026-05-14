@@ -150,6 +150,51 @@ export function triggerRandomMessage(token) {
   });
 }
 
+export function fetchStoryState(token) {
+  return request("/story/state", {
+    method: "GET",
+    token,
+  });
+}
+
+export function fetchStoryBranches(token) {
+  return request("/story/branches", {
+    method: "GET",
+    token,
+  });
+}
+
+export function startStoryBranch(branchKey, token) {
+  return request("/story/start", {
+    method: "POST",
+    token,
+    body: { branch_key: branchKey },
+  });
+}
+
+export function submitStoryChoice(choiceKey, token) {
+  return request("/story/choice", {
+    method: "POST",
+    token,
+    body: { choice_key: choiceKey },
+  });
+}
+
+export function fetchWorldState(token) {
+  return request("/world/state", {
+    method: "GET",
+    token,
+  });
+}
+
+export function submitWorldAction(actionKey, token) {
+  return request("/world/action", {
+    method: "POST",
+    token,
+    body: { action_key: actionKey },
+  });
+}
+
 export function createMessageStream(token, { channel, onMessages, onError } = {}) {
   if (!token || typeof EventSource === "undefined") {
     return null;

@@ -37,11 +37,11 @@ export default defineConfig({
             return "vendor-store";
           }
 
-          if (id.includes("react") || id.includes("scheduler")) {
+          if (id.includes("react") || id.includes("scheduler") || id.includes("react-dom")) {
             return "vendor-react";
           }
 
-          return "vendor-misc";
+          return undefined;
         },
       },
     },

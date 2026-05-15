@@ -4,6 +4,15 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   base: "./",
   plugins: [react()],
+  server: {
+    proxy: {
+      "/oss": {
+        target: "https://earth-1331021090.cos.ap-nanjing.myqcloud.com",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/oss/, ""),
+      },
+    },
+  },
   build: {
     emptyOutDir: false,
     rollupOptions: {

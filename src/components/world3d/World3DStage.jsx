@@ -29,8 +29,12 @@ const DEFAULT_CAM_DISTANCE = 16; // NIKKE风默认
 const DEFAULT_CAM_PITCH = 28;    // NIKKE风默认
 const CAM_YAW = 45; // degrees (fixed)
 
+const OSS_BASE = import.meta.env.DEV
+  ? "/oss"
+  : "https://earth-1331021090.cos.ap-nanjing.myqcloud.com";
+
 const DEFAULT_MODEL_URL =
-  "/assets/avatars/Meshy_AI_Purple_Haired_Chibi_G_biped/Meshy_AI_Emerald_Blossom_biped_Animation_Walking_Woman_withSkin.glb";
+  `${OSS_BASE}/Meshy_AI_Purple_Haired_Chibi_G_biped/Meshy_AI_Purple_Haired_Chibi_G_biped_Animation_Walking_Woman_withSkin.glb`;
 
 function camOffset(dist, pitchDeg, yawDeg) {
   const pitch = (pitchDeg * Math.PI) / 180;
@@ -95,19 +99,19 @@ export function World3DStage({
     const renderers = {};
     renderers.office = (props) => (
       <GLBBuilding
-        url="/assets/avatars/buildingCompany.glb"
+        url={`${OSS_BASE}/buildingCompany.glb`}
         targetHeight={props.targetHeight}
       />
     );
     renderers.market = (props) => (
       <GLBBuilding
-        url="/assets/avatars/market.glb"
+        url={`${OSS_BASE}/market.glb`}
         targetHeight={props.targetHeight}
       />
     );
     renderers.apartment = (props) => (
       <GLBBuilding
-        url="/assets/avatars/home.glb"
+        url={`${OSS_BASE}/home.glb`}
         targetHeight={props.targetHeight}
       />
     );

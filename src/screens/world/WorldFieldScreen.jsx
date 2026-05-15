@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../app/store/authStore";
 import { World3DStage } from "../../components/world3d/World3DStage";
+import { SceneLoadingOverlay } from "../../components/world3d/SceneLoadingOverlay";
 import "./worldFieldScreen.css";
 
 /* ------------------------------------------------------------------ */
@@ -81,6 +82,9 @@ export function WorldFieldScreen() {
     return "town";
   }, [persona]);
 
+  const [isLoading, setIsLoading] = useState(true);
+  const handleLoadReady = useCallback(() => setIsLoading(false), []);
+
   const [sceneKey, setSceneKey] = useState(defaultScene);
   const [targetId, setTargetId] = useState(() => INTERACTIONS[defaultScene][0].id);
   const [storyOpen, setStoryOpen] = useState(false);
@@ -150,6 +154,9 @@ export function WorldFieldScreen() {
 
   return (
     <main className={`world-field world-field--${activeScene.tone}`}>
+      {/* Loading overlay — blocks until GLBs ready & 3s minimum elapsed */}
+      {isLoading && <SceneLoadingOverlay onReady={handleLoadReady} />}
+
       {/* Top bar */}
       <header className="world-field__topbar">
         <div>

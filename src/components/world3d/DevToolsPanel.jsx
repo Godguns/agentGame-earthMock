@@ -11,7 +11,10 @@ const CAMERA_PRESETS = [
   { label: "近景跟拍", fov: 50, distance: 12, pitch: 22,
     desc: "超近跟拍，适合演出过场" },
 ];
-const BASE = "/assets/avatars/Meshy_AI_Purple_Haired_Chibi_G_biped";
+const OSS_BASE = import.meta.env.DEV
+  ? "/oss"
+  : "https://earth-1331021090.cos.ap-nanjing.myqcloud.com";
+const BASE = `${OSS_BASE}/Meshy_AI_Purple_Haired_Chibi_G_biped`;
 const MODEL_OPTIONS = [
   {
     label: "Emerald Blossom",

@@ -2,16 +2,11 @@ import { useRef, useEffect } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 
 /**
- * 3/4 perspective camera supporting both static and follow modes.
+ * 3/4 perspective camera supporting static, follow, and scroll-zoom modes.
  *
- * Static mode (default): camera stays at fixed position — essential for
- * pre-rendered background images where camera movement causes drift.
- *
- * Follow mode: when `target` ref is provided, smoothly follows the
- * character's X/Z position. Use when the background is a world-space
- * ground texture that benefits from parallax.
- *
- * Camera params (offset, fov) are synchronized from dev tools.
+ * Static mode (default): camera stays at fixed position.
+ * Follow mode: when `target` ref is provided, smoothly follows the character.
+ * Scroll zoom: mouse wheel temporarily zooms in, then springs back to base FOV.
  */
 export function CameraRig({
   target,
@@ -21,14 +16,35 @@ export function CameraRig({
   offsetZ = 8.7,
   fov,
 }) {
-  const { camera } = useThree();
+  const { camera, gl } = useThree();
   const lastOffset = useRef({ x: offsetX, y: offsetY, z: offsetZ });
+  const baseFovRef = useRef(fov || 40);
+  const zoomOffsetRef = useRef(0);
 
-  // Sync camera FOV from dev tools
+  // Sync base FOV from dev tools prop
   useEffect(() => {
-    if (fov !== undefined) camera.fov = fov;
-    camera.updateProjectionMatrix();
-  }, [camera, fov]);
+    if (fov !== undefined) baseFovRef.current = fov;
+  }, [fov]);
+
+  // Scroll-wheel → temporary zoom, spring back each frame
+  useEffect(() => {
+    // Attach to both the canvas and window for reliable capture
+    const onWheel = (e) => {
+      // Only capture events over the canvas or its container
+      const el = gl.domElement;
+      const rect = el.getBoundingClientRect();
+      const inside = e.clientX >= rect.left && e.clientX <= rect.right &&
+                     e.clientY >= rect.top && e.clientY <= rect.bottom;
+      if (!inside) return;
+
+      e.preventDefault();
+      // deltaY > 0 = scroll down → zoom in (reduce FOV)
+      zoomOffsetRef.current -= e.deltaY * 0.05;
+      zoomOffsetRef.current = Math.max(-12, Math.min(10, zoomOffsetRef.current));
+    };
+    window.addEventListener("wheel", onWheel, { passive: false });
+    return () => window.removeEventListener("wheel", onWheel);
+  }, [gl]);
 
   useFrame((_, delta) => {
     if (!enabled) return;
@@ -48,21 +64,25 @@ export function CameraRig({
           Math.min(1, delta * 3.5),
         );
         camera.lookAt(targetPos.x, 1.0, targetPos.z);
-        return;
       }
+    } else {
+      // Static mode: apply offset changes from dev tools
+      if (
+        offsetX !== lastOffset.current.x ||
+        offsetY !== lastOffset.current.y ||
+        offsetZ !== lastOffset.current.z
+      ) {
+        lastOffset.current = { x: offsetX, y: offsetY, z: offsetZ };
+        camera.position.set(offsetX, offsetY, offsetZ);
+      }
+      camera.lookAt(0, 0.4, 0);
     }
 
-    // Static mode: apply offset changes from dev tools
-    if (
-      offsetX !== lastOffset.current.x ||
-      offsetY !== lastOffset.current.y ||
-      offsetZ !== lastOffset.current.z
-    ) {
-      lastOffset.current = { x: offsetX, y: offsetY, z: offsetZ };
-      camera.position.set(offsetX, offsetY, offsetZ);
-    }
-
-    camera.lookAt(0, 0.4, 0);
+    // Scroll zoom: always apply regardless of follow/static mode
+    zoomOffsetRef.current += (0 - zoomOffsetRef.current) * Math.min(1, delta * 2.8);
+    const targetFov = baseFovRef.current + zoomOffsetRef.current;
+    camera.fov += (targetFov - camera.fov) * Math.min(1, delta * 10);
+    camera.updateProjectionMatrix();
   });
 
   return null;

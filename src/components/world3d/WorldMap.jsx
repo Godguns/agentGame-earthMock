@@ -1,10 +1,7 @@
 import { Suspense, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { GRID_HALF_X, GRID_HALF_Z } from "./pathfinding";
-
-const WORLD_W = GRID_HALF_X * 2; // 32
-const WORLD_D = GRID_HALF_Z * 2; // 16
+import { GRID_HALF_X, GRID_HALF_Z, WORLD_RADIUS } from "./pathfinding";
 
 /**
  * Generate a procedural anime-style ground texture.
@@ -19,7 +16,7 @@ function makeGroundTex(sceneKey) {
   const s = styles[sceneKey] || styles.metro;
 
   const w = 512;
-  const h = 256;
+  const h = 512;
   const canvas = document.createElement("canvas");
   canvas.width = w;
   canvas.height = h;
@@ -80,7 +77,7 @@ function makeGroundTex(sceneKey) {
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.wrapS = THREE.RepeatWrapping;
   tex.wrapT = THREE.RepeatWrapping;
-  tex.repeat.set(2, 2);
+  tex.repeat.set(1, 1);
   tex.minFilter = THREE.LinearMipmapLinearFilter;
   tex.magFilter = THREE.LinearFilter;
   tex.generateMipmaps = true;
@@ -112,14 +109,14 @@ export function WorldMap({
 
   return (
     <group>
-      {/* Ground plane — procedural anime texture + click-to-move */}
+      {/* Circular ground — procedural anime texture + click-to-move */}
       <mesh
         rotation={[-Math.PI / 2, 0, 0]}
-        position={[0, 0, 0]}
+        position={[0, -0.02, 0]}
         receiveShadow
         onClick={onGroundClick}
       >
-        <planeGeometry args={[WORLD_W, WORLD_D]} />
+        <circleGeometry args={[WORLD_RADIUS, 64]} />
         <meshStandardMaterial
           map={groundTex}
           roughness={0.75}

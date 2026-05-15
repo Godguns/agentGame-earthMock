@@ -1,31 +1,46 @@
 /* ================================================================== */
-/* World Field Screen — 3D NIKKE-style interactive map                */
-/* React UI overlay layer (3D canvas rendered by World3DStage)        */
+/* World Field Screen — Fullscreen 3D NIKKE-style interactive map      */
+/* React UI overlay layer (3D canvas rendered by World3DStage)         */
 /* ================================================================== */
 
 .world-field {
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  padding: 24px 24px 28px;
-  color: rgba(246, 248, 255, 0.96);
-  background: linear-gradient(180deg, rgba(7, 11, 18, 0.98), rgba(10, 14, 22, 1));
+  position: relative;
+  width: 100vw;
+  height: 100dvh;
   overflow: hidden;
+  color: rgba(246, 248, 255, 0.96);
+  background: #0a0e16;
 }
 
-/* ---- Scene tone variables (kept for accent colors) ---- */
+/* ---- Scene tone variables ---- */
 .world-field--city  { --scene-accent: rgba(100, 180, 255, 0.5); }
 .world-field--town  { --scene-accent: rgba(100, 210, 180, 0.5); }
 .world-field--village { --scene-accent: rgba(130, 220, 140, 0.5); }
 
-/* ===== Top bar ===== */
+/* ===== Fullscreen 3D stage ===== */
+.world-field__stage {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+/* ===== Top bar — floats above 3D ===== */
 .world-field__topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
   display: flex;
   align-items: start;
   justify-content: space-between;
   gap: 18px;
-  flex-shrink: 0;
-  z-index: 10;
+  padding: 24px 24px 0;
+  pointer-events: none;
+}
+
+.world-field__topbar > * {
+  pointer-events: auto;
 }
 
 .world-field__eyebrow {
@@ -60,48 +75,94 @@
   background: rgba(255, 255, 255, 0.12);
 }
 
-/* ===== Layout ===== */
-.world-field__layout {
-  display: grid;
-  grid-template-columns: 220px minmax(0, 1fr);
-  gap: 18px;
-  margin-top: 20px;
-  flex: 1;
-  min-height: 0;
-}
-
-/* ===== Scene selector sidebar ===== */
+/* ===== Floating light frosted glass scene selector ===== */
 .world-field__selector {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%) translateX(0);
+  z-index: 20;
   display: grid;
   align-content: start;
-  gap: 10px;
-  z-index: 10;
+  gap: 8px;
+  width: 210px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 16px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.35s ease;
+}
+
+.world-field__selector.is-collapsed {
+  transform: translateY(-50%) translateX(calc(-100% - 40px));
+  opacity: 0;
+}
+
+/* Toggle button */
+.world-field__menu-toggle {
+  position: absolute;
+  right: -44px;
+  top: 8px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  color: rgba(40, 40, 50, 0.8);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.world-field__menu-toggle:hover {
+  background: rgba(255, 255, 255, 0.22);
+  color: rgba(20, 20, 30, 0.95);
+}
+
+/* When collapsed, toggle floats at left edge */
+.world-field__selector.is-collapsed .world-field__menu-toggle {
+  right: auto;
+  left: calc(100% + 8px);
 }
 
 .world-field__scene-pill {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 16px 16px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
-  color: rgba(248, 250, 255, 0.92);
+  padding: 14px 14px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: rgba(40, 40, 50, 0.88);
   text-align: left;
   cursor: pointer;
   transition: all 0.22s ease;
 }
 
 .world-field__scene-pill:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.22);
 }
 
 .world-field__scene-pill.is-active {
-  border-color: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.25);
   background:
-    radial-gradient(circle at 20% 18%, rgba(255, 255, 255, 0.12), transparent 34%),
-    rgba(255, 255, 255, 0.08);
-  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.22);
+    radial-gradient(circle at 20% 18%, rgba(255, 255, 255, 0.22), transparent 38%),
+    rgba(255, 255, 255, 0.18);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255,255,255,0.16);
 }
 
 .world-field__scene-icon {
@@ -120,20 +181,9 @@
 
 .world-field__scene-pill span {
   margin-top: 4px;
-  color: rgba(219, 227, 244, 0.64);
+  color: rgba(60, 60, 70, 0.64);
   font-size: 0.74rem;
   line-height: 1.5;
-}
-
-/* ===== Stage (contains 3D canvas + HUD overlay) ===== */
-.world-field__stage {
-  position: relative;
-  min-height: 72dvh;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow:
-    0 26px 70px rgba(0, 0, 0, 0.36),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 /* ===== HUD overlay (floats above 3D canvas) ===== */
@@ -146,7 +196,7 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: 14px;
-  z-index: 20;
+  z-index: 10;
   pointer-events: none;
 }
 
@@ -155,36 +205,38 @@
 }
 
 .world-field__mission {
-  max-width: 380px;
-  padding: 14px 18px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(8, 12, 18, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  max-width: 260px;
+  padding: 12px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   box-shadow:
-    0 18px 38px rgba(0, 0, 0, 0.26),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    0 8px 32px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 .world-field__mission span {
   display: block;
-  color: rgba(191, 207, 234, 0.56);
-  font-size: 0.7rem;
-  letter-spacing: 0.16em;
+  color: rgba(60, 60, 70, 0.5);
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
 }
 
 .world-field__mission strong {
   display: block;
-  margin-top: 8px;
-  font-size: 1.04rem;
+  margin-top: 5px;
+  font-size: 0.88rem;
+  color: rgba(30, 30, 40, 0.85);
 }
 
 .world-field__mission p {
-  margin: 8px 0 0;
-  color: rgba(226, 232, 244, 0.72);
-  font-size: 0.82rem;
-  line-height: 1.7;
+  margin: 5px 0 0;
+  color: rgba(50, 50, 60, 0.6);
+  font-size: 0.72rem;
+  line-height: 1.6;
 }
 
 .world-field__action-bar {
@@ -195,24 +247,26 @@
 .world-field__action-bar button {
   height: 44px;
   padding: 0 18px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(8, 12, 18, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  color: rgba(248, 250, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  color: rgba(30, 30, 40, 0.85);
   font-size: 0.84rem;
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 .world-field__action-bar button:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
 .world-field__action-bar button:disabled {
-  opacity: 0.45;
+  opacity: 0.35;
   cursor: not-allowed;
 }
 
@@ -364,7 +418,7 @@
   animation: indicator-fade 2s ease-in-out infinite;
 }
 
-/* ===== Keyframes (UI only, 3D animations handled in components) ===== */
+/* ===== Keyframes ===== */
 @keyframes story-overlay-in {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -382,29 +436,14 @@
 
 /* ===== Responsive ===== */
 @media (max-width: 960px) {
-  .world-field {
-    padding: 14px 12px 20px;
-  }
-
-  .world-field__layout {
-    grid-template-columns: 1fr;
+  .world-field__topbar {
+    padding: 14px 12px 0;
   }
 
   .world-field__selector {
-    grid-auto-flow: column;
-    grid-auto-columns: 1fr;
-    overflow-x: auto;
-  }
-
-  .world-field__scene-pill {
-    flex-direction: column;
-    gap: 6px;
-    padding: 14px 12px;
-    text-align: center;
-  }
-
-  .world-field__stage {
-    min-height: 56dvh;
+    left: 8px;
+    width: 180px;
+    padding: 6px;
   }
 
   .world-field__hud {

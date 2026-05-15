@@ -85,6 +85,7 @@ export function WorldFieldScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const handleLoadReady = useCallback(() => setIsLoading(false), []);
 
+  const [menuCollapsed, setMenuCollapsed] = useState(false);
   const [sceneKey, setSceneKey] = useState(defaultScene);
   const [targetId, setTargetId] = useState(() => INTERACTIONS[defaultScene][0].id);
   const [storyOpen, setStoryOpen] = useState(false);
@@ -157,78 +158,83 @@ export function WorldFieldScreen() {
       {/* Loading overlay — blocks until GLBs ready & 3s minimum elapsed */}
       {isLoading && <SceneLoadingOverlay onReady={handleLoadReady} />}
 
-      {/* Top bar */}
-      <header className="world-field__topbar">
-        <div>
-          <p className="world-field__eyebrow">SECOND SCENE · {personaCity}</p>
-          <h1>世界场景</h1>
-        </div>
-        <div className="world-field__top-actions">
-          <button type="button" onClick={() => navigate("/game")}>返回主界面</button>
-          <button type="button" onClick={() => navigate("/avatar/setup")}>切换形象</button>
-        </div>
-      </header>
+      {/* Fullscreen 3D stage — fills entire viewport */}
+      <section className="world-field__stage">
+        <World3DStage
+          key={sceneKey}
+          sceneKey={sceneKey}
+          buildings={points}
+          activeTargetId={targetId}
+          onBuildingClick={handleBuildingClick}
+          onGroundClick={handleGroundClick}
+          onArrived={handleArrived}
+          avatarAccent={avatarAccent}
+        />
 
-      <section className="world-field__layout">
-        {/* Scene selector sidebar */}
-        <aside className="world-field__selector">
-          {SCENE_OPTIONS.map((item) => (
-            <button
-              key={item.key}
-              type="button"
-              className={`world-field__scene-pill ${sceneKey === item.key ? "is-active" : ""}`}
-              onClick={() => handleSceneSwitch(item.key)}
-            >
-              <span className="world-field__scene-icon">{item.icon}</span>
-              <div>
-                <strong>{item.label}</strong>
-                <span>{item.subtitle}</span>
-              </div>
-            </button>
-          ))}
-        </aside>
-
-        {/* Main stage — Real 3D NIKKE-style map */}
-        <section className="world-field__stage">
-          {/* 3D Canvas layer (replaces old CSS parallax) */}
-          <World3DStage
-            key={sceneKey}
-            sceneKey={sceneKey}
-            buildings={points}
-            activeTargetId={targetId}
-            onBuildingClick={handleBuildingClick}
-            onGroundClick={handleGroundClick}
-            onArrived={handleArrived}
-            avatarAccent={avatarAccent}
-          />
-
-          {/* HUD overlay — floats above 3D canvas */}
-          <div className="world-field__hud">
-            <div className="world-field__mission">
-              <span>当前场景</span>
-              <strong>{activeScene.icon} {activeScene.label}</strong>
-              <p>
-                {walking
-                  ? `正在前往 ${activePoint.label}...`
-                  : "点击地图中的建筑或地面，角色会寻路走过去并触发交互剧情。"}
-              </p>
-            </div>
-
-            <div className="world-field__action-bar">
-              <button type="button" onClick={() => {
-                setTargetId(activePoint.id);
-                setWalking(true);
-                setArrived(false);
-              }}>
-                前往当前位置
-              </button>
-              <button type="button" onClick={() => setStoryOpen(true)} disabled={!arrived && !storyOpen}>
-                查看剧情
-              </button>
-            </div>
+        {/* Top bar — floats above 3D */}
+        <header className="world-field__topbar">
+          <div>
+            {/* <p className="world-field__eyebrow">SECOND SCENE · {personaCity}</p>
+            <h1>世界场景</h1> */}
           </div>
-        </section>
+          <div className="world-field__top-actions">
+            <button type="button" onClick={() => navigate("/game")}>返回主界面</button>
+            <button type="button" onClick={() => navigate("/avatar/setup")}>切换形象</button>
+          </div>
+        </header>
+
+        {/* HUD overlay — floats above 3D canvas */}
+        <div className="world-field__hud">
+          <div className="world-field__mission">
+            <span>当前场景</span>
+            <strong>{activeScene.icon} {activeScene.label}</strong>
+            <p>
+              {walking
+                ? `正在前往 ${activePoint.label}...`
+                : "点击地图中的建筑或地面，角色会寻路走过去并触发交互剧情。"}
+            </p>
+          </div>
+
+          <div className="world-field__action-bar">
+            <button type="button" onClick={() => {
+              setTargetId(activePoint.id);
+              setWalking(true);
+              setArrived(false);
+            }}>
+              前往当前位置
+            </button>
+            <button type="button" onClick={() => setStoryOpen(true)} disabled={!arrived && !storyOpen}>
+              查看剧情
+            </button>
+          </div>
+        </div>
       </section>
+
+      {/* Floating light frosted glass scene selector */}
+      <aside className={`world-field__selector ${menuCollapsed ? "is-collapsed" : ""}`}>
+        <button
+          type="button"
+          className="world-field__menu-toggle"
+          onClick={() => setMenuCollapsed((v) => !v)}
+          aria-label={menuCollapsed ? "展开菜单" : "收起菜单"}
+        >
+          {menuCollapsed ? "☰" : "✕"}
+        </button>
+        {SCENE_OPTIONS.map((item) => (
+          <button
+            key={item.key}
+            type="button"
+            className={`world-field__scene-pill ${sceneKey === item.key ? "is-active" : ""}`}
+            onClick={() => handleSceneSwitch(item.key)}
+          >
+            <span className="world-field__scene-icon">{item.icon}</span>
+            <div>
+              <strong>{item.label}</strong>
+              <span>{item.subtitle}</span>
+            </div>
+          </button>
+        ))}
+      </aside>
 
       {/* Story dialog — VN-style bottom panel (React overlay above 3D) */}
       {storyOpen ? (

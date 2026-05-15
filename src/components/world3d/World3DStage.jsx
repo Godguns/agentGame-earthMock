@@ -22,7 +22,7 @@ const DEFAULT_LIGHTING = {
   point: { intensity: 0.4, color: "#fff4ee", posX: 0, posY: 3, posZ: 6 },
 };
 
-const DEFAULT_FOG = { color: "#d8dce8", near: 38, far: 80 };
+const DEFAULT_FOG = { color: "#d8dce8", near: 42, far: 90 };
 const DEFAULT_EXPOSURE = 1.0;
 const DEFAULT_CAM_FOV = 35;      // NIKKE风默认
 const DEFAULT_CAM_DISTANCE = 16; // NIKKE风默认
@@ -185,7 +185,7 @@ export function World3DStage({
           position: initialCamPos,
           fov: camFov,
           near: 0.5,
-          far: 80,
+          far: 100,
         }}
         gl={{
           antialias: true,
@@ -210,11 +210,11 @@ export function World3DStage({
           castShadow
           shadow-mapSize-width={2048}
           shadow-mapSize-height={2048}
-          shadow-camera-far={60}
-          shadow-camera-left={-22}
-          shadow-camera-right={22}
-          shadow-camera-top={14}
-          shadow-camera-bottom={-14}
+          shadow-camera-far={70}
+          shadow-camera-left={-28}
+          shadow-camera-right={28}
+          shadow-camera-top={28}
+          shadow-camera-bottom={-28}
           color={lighting.sun.color}
         />
 

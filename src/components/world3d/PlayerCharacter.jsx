@@ -69,8 +69,9 @@ function CharacterModel({ url, isWalking, groupRef }) {
     const anyAction = Object.values(actions)[0];
 
     if (isWalking) {
-      // Stop any current action first
+      // Unpause and fade out whatever was playing, then start walk
       Object.values(actions).forEach((a) => {
+        a.paused = false;
         if (a.isRunning()) a.fadeOut(0.15);
       });
       const action = walkAction || anyAction;
@@ -79,8 +80,10 @@ function CharacterModel({ url, isWalking, groupRef }) {
         action.reset().fadeIn(0.15).play();
       }
     } else {
-      // Idle — stop all animations, character stands frozen
-      Object.values(actions).forEach((a) => a.stop());
+      // Arrived — pause at current frame instead of snapping to T-pose
+      Object.values(actions).forEach((a) => {
+        a.paused = true;
+      });
     }
   }, [isWalking, actions]);
 

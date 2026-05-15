@@ -6,8 +6,9 @@
  */
 
 const CELL_SIZE = 0.5;
-const GRID_HALF_X = 16; // total width 32 units
-const GRID_HALF_Z = 8; // total depth 16 units
+const GRID_HALF_X = 20; // total width 40 units
+const GRID_HALF_Z = 20; // total depth 40 units
+const WORLD_RADIUS = 20; // circular ground radius
 
 function worldToGrid(worldPos) {
   const col = Math.round((worldPos.x + GRID_HALF_X) / CELL_SIZE);
@@ -241,4 +242,4 @@ export function percentToWorld(percentX, percentY) {
   };
 }
 
-export { GRID_HALF_X, GRID_HALF_Z, CELL_SIZE, worldToGrid, gridToWorld, buildObstacleGrid };
+export { GRID_HALF_X, GRID_HALF_Z, WORLD_RADIUS, CELL_SIZE, worldToGrid, gridToWorld, buildObstacleGrid };

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ShinyText } from "../../components/ui/ShinyText";
-import { GlareHover, ClickSpark } from "@appletosolutions/reactbits";
+import { GlareHover, ClickSpark } from "../../components/ui/reactbitsLite";
 
 import { hasBoundPersona, useAuthStore } from "../../app/store/authStore";
 import godgunsAvatar from "../../../godguns.jpg";

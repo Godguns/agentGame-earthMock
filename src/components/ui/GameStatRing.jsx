@@ -1,4 +1,4 @@
-import { CountUp } from "@appletosolutions/reactbits";
+import { CountUp } from "./reactbitsLite";
 import "./gameUi.css";
 
 export function GameStatRing({ label, value, color }) {

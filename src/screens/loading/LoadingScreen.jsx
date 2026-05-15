@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { DecryptedText } from "@appletosolutions/reactbits";
+import { DecryptedText } from "../../components/ui/reactbitsLite";
 
 import { ParticleField } from "../../components/atmosphere/ParticleField";
 import { ScanlineOverlay } from "../../components/atmosphere/ScanlineOverlay";

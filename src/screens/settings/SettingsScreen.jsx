@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocation, useNavigate } from "react-router-dom";
-import { AnimatedContent } from "@appletosolutions/reactbits";
+import { AnimatedContent } from "../../components/ui/reactbitsLite";
 
 import { hasBoundPersona, useAuthStore } from "../../app/store/authStore";
 import {

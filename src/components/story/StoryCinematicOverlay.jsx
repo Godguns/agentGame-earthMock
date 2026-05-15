@@ -1,4 +1,4 @@
-import { BlurText, Bounce } from "@appletosolutions/reactbits";
+import { BlurText, Bounce } from "../ui/reactbitsLite";
 import "./storyCinematicOverlay.css";
 
 export function StoryCinematicOverlay({

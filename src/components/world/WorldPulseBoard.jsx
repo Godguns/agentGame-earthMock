@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { ShinyText } from "../ui/ShinyText";
-import { GlareHover, Magnet, CountUp } from "@appletosolutions/reactbits";
+import { GlareHover, Magnet } from "../ui/reactbitsLite";
 
 import { useAuthStore } from "../../app/store/authStore";
 import { GameActionCard } from "../ui/GameActionCard";

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+﻿import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -41,13 +41,13 @@ const WEATHER_OPTIONS = [
     id: "cloudy",
     label: "多云",
     image: GAME_SCENE_ASSETS.weatherCloudy,
-    mood: "天色发灰，像一整天都还没真正开始。",
+    mood: "天色有些发灰，像这一天还没有真正开始。",
   },
   {
     id: "sunny",
     label: "晴天",
     image: GAME_SCENE_ASSETS.weatherSunny,
-    mood: "光线太亮，桌上的灰尘都像有了重量。",
+    mood: "光线很亮，桌上的灰尘都像被照出了重量。",
   },
   {
     id: "sunset",
@@ -59,19 +59,19 @@ const WEATHER_OPTIONS = [
     id: "rain",
     label: "雨天",
     image: GAME_SCENE_ASSETS.weatherRain,
-    mood: "玻璃外面很安静，只剩雨在替你说话。",
+    mood: "玻璃外面很安静，只剩雨声替你说话。",
   },
   {
     id: "snow",
     label: "下雪",
     image: GAME_SCENE_ASSETS.weatherSnow,
-    mood: "世界被压低了音量，像有人替你盖上被子。",
+    mood: "世界像被压低了音量，像有人替你盖上了被子。",
   },
   {
     id: "night",
     label: "夜晚",
     image: GAME_SCENE_ASSETS.weatherNight,
-    mood: "天已经暗了，房间像只剩屏幕还在醒着。",
+    mood: "天已经暗了，房间里只剩屏幕还醒着。",
   },
 ];
 
@@ -120,7 +120,7 @@ const DEVICES = [
     label: "iPod",
     title: "音乐播放器",
     image: GAME_SCENE_ASSETS.ipod,
-    note: "声音与回忆",
+    note: "声音与回响",
     position: {
       left: "82.9%",
       top: "83%",
@@ -147,7 +147,7 @@ function formatWeatherTimestamp(value) {
     return "";
   }
 
-  return value.replace("T", " · ");
+  return value.replace("T", " 路 ");
 }
 
 function OrbIcon({ kind }) {
@@ -371,6 +371,7 @@ export function GameSceneScreen() {
   const [isIphonePressing, setIsIphonePressing] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isStoryOpen, setIsStoryOpen] = useState(false);
+  const [isWorldOpen, setIsWorldOpen] = useState(false);
   const [storyChoiceFeedback, setStoryChoiceFeedback] = useState(null);
   const [storyState, setStoryState] = useState(null);
   const [storyStatus, setStoryStatus] = useState("idle");
@@ -602,7 +603,7 @@ export function GameSceneScreen() {
       setWeatherState((current) => ({
         ...current,
         status: isManual ? "refreshing" : "loading",
-        locationLabel: weatherLocation.label || `${weatherLocation.province} · ${weatherLocation.city}`,
+        locationLabel: weatherLocation.label || `${weatherLocation.province} 路 ${weatherLocation.city}`,
         cityLabel: weatherLocation.city || "",
       }));
 
@@ -627,7 +628,7 @@ export function GameSceneScreen() {
           ...current,
           status: "error",
           locationLabel:
-            weatherLocation.label || `${weatherLocation.province} · ${weatherLocation.city}`,
+            weatherLocation.label || `${weatherLocation.province} 路 ${weatherLocation.city}`,
           cityLabel: weatherLocation.city || "",
           mood: "实时天气暂时没有连上，窗外场景先保持当前氛围。",
         }));
@@ -764,7 +765,11 @@ export function GameSceneScreen() {
   );
   const isDimWeather = ["rain", "snow", "night"].includes(activeWeatherId);
   const isOverlayActive =
-    isPhoneVisible || activeSurfaceId !== null || isProfileOpen;
+    isPhoneVisible ||
+    activeSurfaceId !== null ||
+    isProfileOpen ||
+    isStoryOpen ||
+    isWorldOpen;
   const activeStoryScene = storyState?.scene || null;
   const storyBranches = storyState?.branches || [];
   const activeStoryTitle = activeStoryScene?.title || "人生主线";
@@ -810,7 +815,7 @@ export function GameSceneScreen() {
       setStoryStatus("loading");
       const nextState = await startStoryBranch(branch.key, authToken);
       setStoryState(nextState);
-      setStoryChoiceFeedback(`主线已进入「${branch.label}」`);
+      setStoryChoiceFeedback(`主线已进入 ${branch.label}`);
       setStoryStatus("ready");
     } catch (error) {
       console.warn("Failed to start story branch.", error);
@@ -869,21 +874,21 @@ export function GameSceneScreen() {
 
       <div className="game-scene__art">
         <div className="game-scene__artboard">
-        <img
-          key={activeWeather.id}
-          className="game-scene__weather-layer"
-          src={activeWeather.image}
-          alt={`${activeWeather.label}的窗外景色`}
-        />
-        <img
-          className="game-scene__base"
-          src={
-            isLampOn
-              ? GAME_SCENE_ASSETS.baseLampOn
-              : GAME_SCENE_ASSETS.baseLampOff
-          }
-          alt="卧室里的办公桌场景"
-        />
+          <img
+            key={activeWeather.id}
+            className="game-scene__weather-layer"
+            src={activeWeather.image}
+            alt={`${activeWeather.label}的窗外场景`}
+          />
+          <img
+            className="game-scene__base"
+            src={
+              isLampOn
+                ? GAME_SCENE_ASSETS.baseLampOn
+                : GAME_SCENE_ASSETS.baseLampOff
+            }
+            alt="卧室里的办公桌场景"
+          />
 
         <div className="game-scene__device-layer" aria-label="桌面设备">
           {DEVICES.map((device) => (
@@ -959,7 +964,7 @@ export function GameSceneScreen() {
         aria-label="返回开始游戏页面"
       >
         <span className="game-scene__orb-icon" aria-hidden="true">
-          ←
+          ↗
         </span>
       </button>
 
@@ -991,13 +996,13 @@ export function GameSceneScreen() {
               {/* <OrbIcon kind={activeWeatherId} /> */}
             </span>
             <div className="game-scene__weather-text">
-          <span className="game-scene__weather-date">
-            {weatherState.locationLabel || "实时天气同步中"}
-            {weatherState.updatedAt
-              ? ` | ${formatWeatherTimestamp(weatherState.updatedAt)}`
-              : ""}
-          </span>
-          <strong className="game-scene__weather-title">窗外</strong>
+              <span className="game-scene__weather-date">
+                {weatherState.locationLabel || "实时天气同步中"}
+                {weatherState.updatedAt
+                  ? ` | ${formatWeatherTimestamp(weatherState.updatedAt)}`
+                  : ""}
+              </span>
+              <strong className="game-scene__weather-title">窗外</strong>
             </div>
           </div>
           <p className="game-scene__weather-copy">
@@ -1083,7 +1088,7 @@ export function GameSceneScreen() {
                   option.id === activeWeatherId ? "is-active" : ""
                 }`}
                 onClick={() => setActiveWeatherId(option.id)}
-                aria-label={`切换到${option.label}`}
+                aria-label={`切换到 ${option.label}`}
               >
                 <span className="game-scene__orb-icon" aria-hidden="true">
                   <OrbIcon kind={option.id} />
@@ -1094,27 +1099,64 @@ export function GameSceneScreen() {
         </div>
       </header>
 
-      <button
-        type="button"
-        className="game-scene__profile-trigger"
-        onClick={handleOpenProfile}
-      >
-        <span>Persona Bound</span>
-        <strong>按 Esc 查看人格档案</strong>
-      </button>
+      <div className="game-scene__pillbar">
+        <button
+          type="button"
+          className={`game-scene__pill-toggle ${isWorldOpen ? "is-active" : ""}`}
+          onClick={() => setIsWorldOpen((current) => !current)}
+        >
+          <span>WORLD</span>
+          <strong>世界状态</strong>
+        </button>
 
-      <button
-        type="button"
-        className="game-scene__story-trigger"
-        onClick={() => setIsStoryOpen(true)}
-      >
-        <span>STORY</span>
-        <strong>打开主剧情</strong>
-      </button>
+        <button
+          type="button"
+          className={`game-scene__pill-toggle ${isStoryOpen ? "is-active" : ""}`}
+          onClick={() => setIsStoryOpen((current) => !current)}
+        >
+          <span>STORY</span>
+          <strong>主剧情</strong>
+        </button>
+
+        <button
+          type="button"
+          className={`game-scene__pill-toggle ${isProfileOpen ? "is-active" : ""}`}
+          onClick={() => {
+            if (isProfileOpen) {
+              setIsProfileOpen(false);
+              return;
+            }
+            handleOpenProfile();
+          }}
+        >
+          <span>PERSONA</span>
+          <strong>人格档案</strong>
+        </button>
+
+        <div className="game-scene__pill-divider" aria-hidden="true" />
+
+        <button
+          type="button"
+          className="game-scene__pill-toggle game-scene__pill-toggle--nav"
+          onClick={() => navigate("/avatar/setup")}
+        >
+          <span>AVATAR</span>
+          <strong>形象选择</strong>
+        </button>
+
+        <button
+          type="button"
+          className="game-scene__pill-toggle game-scene__pill-toggle--nav"
+          onClick={() => navigate("/world/field")}
+        >
+          <span>FIELD</span>
+          <strong>进入世界</strong>
+        </button>
+      </div>
 
       <div className="game-scene__status">
         <span>
-          状态：刚醒，还没彻底回到现实。台灯
+          状态：刚醒，还没完全回到现实。台灯
           {isLampOn ? "还亮着。" : "已经关掉了。"}
         </span>
       </div>
@@ -1124,12 +1166,12 @@ export function GameSceneScreen() {
           你醒了。桌上的屏幕都还亮着，
           {isLampOn
             ? "灯光把桌角照得很安静。"
-            : "房间只剩窗外和屏幕在发光。"}
+            : "房间里只剩窗外和屏幕在发光。"}
         </p>
       </div>
 
       {activeSurface ? renderActiveSurface() : null}
-      <WorldPulseBoard />
+      <WorldPulseBoard open={isWorldOpen} />
       <VirtualPhone state={phoneState} onClose={handlePhoneClose} />
       <StoryCinematicOverlay
         open={isStoryOpen}

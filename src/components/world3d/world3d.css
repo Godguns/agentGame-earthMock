@@ -1,0 +1,10 @@
+.world3d-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+/* Canvas fills the entire stage area */
+.world3d-stage canvas {
+  display: block;
+}

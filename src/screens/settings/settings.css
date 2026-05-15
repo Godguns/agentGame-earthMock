@@ -55,8 +55,10 @@
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 22%),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 0, transparent 24%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02) 22%, rgba(8, 12, 20, 0.18) 100%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 0, transparent 24%);
+  backdrop-filter: blur(22px) saturate(118%);
+  -webkit-backdrop-filter: blur(22px) saturate(118%);
   pointer-events: none;
   animation: none;
 }
@@ -108,9 +110,12 @@
   overflow: auto;
   padding: clamp(20px, 3vw, 34px) clamp(18px, 2.4vw, 28px) clamp(18px, 2.8vw, 30px);
   border-right: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(10, 16, 32, 0.62);
-  backdrop-filter: blur(18px) saturate(140%);
-  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  background: rgba(10, 16, 32, 0.46);
+  backdrop-filter: blur(28px) saturate(150%);
+  -webkit-backdrop-filter: blur(28px) saturate(150%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 18px 40px rgba(0, 0, 0, 0.14);
 }
 
 .settings-sidebar__back {
@@ -159,11 +164,11 @@
   padding: 12px 14px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 18px;
-  background: rgba(10, 16, 32, 0.5);
+  background: rgba(10, 16, 32, 0.38);
   color: var(--text-secondary);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(18px) saturate(140%);
-  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
 }
 
 .settings-sidebar__sync span {
@@ -201,13 +206,15 @@
 
 .settings-nav__item {
   border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(10, 16, 32, 0.5);
+  background: rgba(10, 16, 32, 0.36);
   padding: 16px 16px 14px;
   border-radius: 14px;
   color: var(--text-primary);
   text-align: left;
   cursor: pointer;
   font: inherit;
+  backdrop-filter: blur(22px) saturate(145%);
+  -webkit-backdrop-filter: blur(22px) saturate(145%);
   transition:
     border-color 220ms ease,
     background 220ms ease,
@@ -218,14 +225,14 @@
 .settings-nav__item:hover,
 .settings-nav__item:focus-visible {
   border-color: rgba(255, 255, 255, 0.32);
-  background: rgba(18, 28, 46, 0.68);
+  background: rgba(18, 28, 46, 0.52);
   transform: translateX(4px);
   outline: none;
 }
 
 .settings-nav__item.is-active {
   border-color: rgba(255, 255, 255, 0.36);
-  background: rgba(20, 32, 52, 0.72);
+  background: rgba(20, 32, 52, 0.56);
   box-shadow: 0 4px 16px rgba(255, 255, 255, 0.12);
 }
 
@@ -284,11 +291,12 @@
   padding: 12px 14px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
-  background: rgba(10, 16, 32, 0.5);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(10, 16, 32, 0.34);
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
   color: var(--text-secondary);
   text-align: right;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .settings-panel__summary span {
@@ -2453,4 +2461,34 @@ fieldset.persona-question {
   .location-anchor__statusbar {
     display: grid;
   }
+}
+
+/* Final active-state theme overrides */
+.settings-nav__item.is-active,
+.persona-flow__rail-node.is-active,
+.choice-chip.is-active,
+.chrono-selector__value.is-active {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-color: rgba(255, 255, 255, 0.96) !important;
+  color: rgba(12, 16, 24, 0.96) !important;
+  text-shadow: none !important;
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.42) !important;
+}
+
+.settings-nav__item.is-active .settings-nav__label,
+.settings-nav__item.is-active .settings-nav__description,
+.persona-flow__rail-node.is-active .persona-flow__rail-copy strong,
+.persona-flow__rail-node.is-active .persona-flow__rail-copy em,
+.choice-chip.is-active,
+.chrono-selector__value.is-active {
+  color: rgba(12, 16, 24, 0.96) !important;
+}
+
+.persona-flow__rail-node.is-active .persona-flow__rail-index {
+  background: rgba(12, 16, 24, 0.08) !important;
+  border-color: rgba(12, 16, 24, 0.16) !important;
+  color: rgba(12, 16, 24, 0.96) !important;
+  box-shadow: none !important;
 }

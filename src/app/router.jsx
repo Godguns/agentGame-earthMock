@@ -5,6 +5,8 @@ import { InternalUsersRoute } from "../routes/InternalUsersRoute";
 import { LoadingRoute } from "../routes/LoadingRoute";
 import { MainMenuRoute } from "../routes/MainMenuRoute";
 import { SettingsRoute } from "../routes/SettingsRoute";
+import { AvatarSetupRoute } from "../routes/AvatarSetupRoute";
+import { WorldFieldRoute } from "../routes/WorldFieldRoute";
 import { SceneLayout } from "./SceneLayout";
 
 export const router = createHashRouter([
@@ -30,6 +32,14 @@ export const router = createHashRouter([
       {
         path: "/settings",
         element: <SettingsRoute />,
+      },
+      {
+        path: "/avatar/setup",
+        element: <AvatarSetupRoute />,
+      },
+      {
+        path: "/world/field",
+        element: <WorldFieldRoute />,
       },
       {
         path: "/internal/users",

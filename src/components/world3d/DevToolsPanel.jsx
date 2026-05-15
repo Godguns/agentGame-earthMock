@@ -13,16 +13,15 @@ const CAMERA_PRESETS = [
 ];
 const OSS_BASE = import.meta.env.DEV
   ? "/oss"
-  : "https://earth-1331021090.cos.ap-nanjing.myqcloud.com";
-const BASE = `${OSS_BASE}/Meshy_AI_Purple_Haired_Chibi_G_biped`;
+  : "https://earth2-1331021090.cos.ap-nanjing.myqcloud.com";
 const MODEL_OPTIONS = [
   {
     label: "Emerald Blossom",
-    url: `${BASE}/Meshy_AI_Emerald_Blossom_biped_Animation_Walking_Woman_withSkin.glb`,
+    url: `${OSS_BASE}/Meshy_AI_Emerald_Blossom_biped_Animation_Walking_Woman_withSkin.glb`,
   },
   {
     label: "Purple Haired",
-    url: `${BASE}/Meshy_AI_Purple_Haired_Chibi_G_biped_Animation_Walking_Woman_withSkin.glb`,
+    url: `${OSS_BASE}/Meshy_AI_Purple_Haired_Chibi_G_biped_Animation_Walking_Woman_withSkin.glb`,
   },
 ];
 const LIGHTING_PRESETS = {

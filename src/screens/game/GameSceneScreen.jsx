@@ -37,11 +37,12 @@ import { useGLTF } from "@react-three/drei";
 /* Preload 3D scene models in the background as soon as this page mounts */
 const _OSS = import.meta.env.DEV
   ? "/oss"
-  : "https://earth-1331021090.cos.ap-nanjing.myqcloud.com";
+  : "https://earth2-1331021090.cos.ap-nanjing.myqcloud.com";
 useGLTF.preload(`${_OSS}/market.glb`);
 useGLTF.preload(`${_OSS}/home.glb`);
 useGLTF.preload(`${_OSS}/buildingCompany.glb`);
-useGLTF.preload(`${_OSS}/Meshy_AI_Purple_Haired_Chibi_G_biped/Meshy_AI_Purple_Haired_Chibi_G_biped_Animation_Walking_Woman_withSkin.glb`);
+useGLTF.preload(`${_OSS}/Meshy_AI_Purple_Haired_Chibi_G_biped_Animation_Walking_Woman_withSkin.glb`);
+useGLTF.preload(`${_OSS}/Meshy_AI_Emerald_Blossom_biped_Animation_Walking_Woman_withSkin.glb`);
 
 const MOCK_NOTIFICATION_INTERVAL_MS = 3 * 60 * 1000;
 const WEATHER_REFRESH_INTERVAL_MS = 20 * 60 * 1000;

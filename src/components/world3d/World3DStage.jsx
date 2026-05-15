@@ -31,10 +31,10 @@ const CAM_YAW = 45; // degrees (fixed)
 
 const OSS_BASE = import.meta.env.DEV
   ? "/oss"
-  : "https://earth-1331021090.cos.ap-nanjing.myqcloud.com";
+  : "https://earth2-1331021090.cos.ap-nanjing.myqcloud.com";
 
 const DEFAULT_MODEL_URL =
-  `${OSS_BASE}/Meshy_AI_Purple_Haired_Chibi_G_biped/Meshy_AI_Purple_Haired_Chibi_G_biped_Animation_Walking_Woman_withSkin.glb`;
+  `${OSS_BASE}/Meshy_AI_Purple_Haired_Chibi_G_biped_Animation_Walking_Woman_withSkin.glb`;
 
 function camOffset(dist, pitchDeg, yawDeg) {
   const pitch = (pitchDeg * Math.PI) / 180;
